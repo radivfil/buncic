@@ -1,0 +1,34 @@
+---
+/*
+  Diskretna oznaka za sadržaj koji je PRIMJER i mora ga potvrditi klijent
+  (polje potvrdeno: false u content collections).
+  Za prezentaciju bez oznaka: PUBLIC_DEMO_OZNAKE=false u .env
+*/
+interface Props {
+  potvrdeno?: boolean;
+  tekst?: string;
+  class?: string;
+}
+const { potvrdeno = false, tekst = 'Primjer, potvrditi', class: klasa = '' } = Astro.props;
+const prikazi = !potvrdeno && import.meta.env.PUBLIC_DEMO_OZNAKE !== 'false';
+---
+
+{
+  prikazi && (
+    <span
+      class:list={['demo-oznaka inline-flex items-center border border-dashed px-2 py-0.5 text-xs font-medium tracking-normal', klasa]}
+      title="Sadržaj je primjer i treba ga potvrditi klijent"
+    >
+      {tekst}
+    </span>
+  )
+}
+
+<style>
+  .demo-oznaka {
+    border-color: color-mix(in srgb, currentColor 55%, transparent);
+    color: inherit;
+    opacity: 0.8;
+    font-family: var(--font-sans);
+  }
+</style>

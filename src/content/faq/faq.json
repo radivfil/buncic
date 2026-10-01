@@ -1,0 +1,67 @@
+[
+  {
+    "id": "parking",
+    "pitanje": "Ima li dovoljno parkirnih mjesta za sve goste?",
+    "odgovor": "Da. Na raspolaganju je prostrano asfaltirano parkiralište pod nadzorom i podzemna garaža, na samom imanju.",
+    "redoslijed": 1,
+    "potvrdeno": false,
+    "napomena": "Parkiralište i garaža potvrđeni na postojećoj stranici; 'bez naplate' potvrditi"
+  },
+  {
+    "id": "do-kada",
+    "pitanje": "Do koliko sati traje glazba i slavlje?",
+    "odgovor": "Tijekom svadbenih svečanosti radimo od 7 do 6 sati ujutro, pa slavlje ne morate prekidati u ponoć.",
+    "redoslijed": 2,
+    "potvrdeno": true
+  },
+  {
+    "id": "smjestaj",
+    "pitanje": "Mogu li gosti prespavati na imanju?",
+    "odgovor": "Mogu. Imamo 40 soba s kupaonicom, klimom i TV-om, a recepcija radi 0-24. Za svatove preporučujemo rezervaciju soba zajedno s terminom.",
+    "redoslijed": 3,
+    "potvrdeno": true
+  },
+  {
+    "id": "obred",
+    "pitanje": "Može li obred vjenčanja biti na otvorenom?",
+    "odgovor": "Može. Imanje je okruženo voćnjacima i vinogradima, a obred na otvorenom i fotografiranje dio su naše ponude.",
+    "redoslijed": 4,
+    "potvrdeno": true
+  },
+  {
+    "id": "torta",
+    "pitanje": "Možemo li donijeti svoju tortu ili kolače?",
+    "odgovor": "[UNIJETI STVARNI SADRŽAJ] Naši slastičari izrađuju torte i kolače po vašim željama. Pravilo za vlastite torte potvrditi s klijentom.",
+    "redoslijed": 5,
+    "potvrdeno": false
+  },
+  {
+    "id": "pice",
+    "pitanje": "Je li piće uključeno u cijenu menija?",
+    "odgovor": "[UNIJETI STVARNI SADRŽAJ] Klasični svadbeni meni uključuje neograničeno domaće piće. Uvjete za strana i posebna pića potvrditi s klijentom.",
+    "redoslijed": 6,
+    "potvrdeno": false,
+    "napomena": "Neograničeno domaće piće navedeno na staroj stranici (2008.)"
+  },
+  {
+    "id": "pristupacnost",
+    "pitanje": "Jesu li dvorane pristupačne osobama u invalidskim kolicima?",
+    "odgovor": "[UNIJETI STVARNI SADRŽAJ] Opisati pristup dvoranama, sanitarni čvor i parkirna mjesta za osobe s invaliditetom.",
+    "redoslijed": 7,
+    "potvrdeno": false
+  },
+  {
+    "id": "vanjski-catering",
+    "pitanje": "Možemo li dovesti vanjskog dobavljača hrane ili vlastiti bend?",
+    "odgovor": "[UNIJETI STVARNI SADRŽAJ] Pravila za vanjske dobavljače, bendove, DJ-eve i fotografe potvrditi s klijentom.",
+    "redoslijed": 8,
+    "potvrdeno": false
+  },
+  {
+    "id": "rezervacija",
+    "pitanje": "Koliko unaprijed trebamo rezervirati termin?",
+    "odgovor": "[UNIJETI STVARNI SADRŽAJ] Termini za sezonu se brzo popunjavaju. Uvjete rezervacije i akontacije potvrditi s klijentom.",
+    "redoslijed": 9,
+    "potvrdeno": false
+  }
+]

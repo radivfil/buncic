@@ -1,0 +1,233 @@
+@import "@fontsource-variable/brygada-1918";
+@import "@fontsource-variable/brygada-1918/wght-italic.css";
+@import "@fontsource-variable/work-sans";
+@import "tailwindcss";
+
+/*
+  Paleta je izvedena iz logotipa (bordo #723422, zlatna #DCC592, krem #E8D9B8).
+  Display font: Brygada 1918 (poljski tipografski rez iz 1918., digitaliziran 2018.),
+  rijedak u wedding niši i nosi priču o tradiciji; tekst: Work Sans.
+
+  Dvije vrste boja:
+  - FIKSNE (krem, ink, bordo, zlato, podrum): isti ton u obje teme. Koriste se na
+    fotografijama, u tamnim trakama, podnožju i gumbima.
+  - SEMANTIČKE (pozadina, povrsina, tekst, naglasak, rub, greska): mijenjaju se
+    sa svijetlom / tamnom temom (html[data-tema]).
+  Oblik: oštri rubovi; luk (arch) samo na početnoj i u pismu mladencima.
+*/
+@theme {
+  --font-display: "Brygada 1918 Variable", "Brygada 1918", Georgia, serif;
+  --font-sans: "Work Sans Variable", "Work Sans", system-ui, sans-serif;
+
+  --color-bordo: #723422;
+  --color-bordo-700: #5c2a1b;
+  --color-bordo-900: #3d1c12;
+  --color-zlato: #dcc592;
+  --color-zlato-300: #e8d9b8;
+  --color-krem: #f4eee3;
+  --color-krem-200: #ebe1cf;
+  --color-ink: #2b1c16;
+  --color-ink-soft: #5e4b41;
+  --color-podrum: #1d1411;
+  --color-podrum-800: #281c17;
+  --color-podrum-700: #3a2a22;
+  --color-kamen: #b9a896;
+
+  /* Semantički tokeni, svijetla tema (zadano) */
+  --color-pozadina: #f4eee3;
+  --color-pozadina-2: #ebe1cf;
+  --color-povrsina: #fbf8f2;
+  --color-tekst: #2b1c16;
+  --color-tekst-meki: #5e4b41;
+  --color-naglasak: #723422;
+  --color-rub: #2b1c16;
+  --color-greska: #9b1c1c;
+
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --breakpoint-xs: 22.5rem;
+}
+
+/* Tamna tema: topla tamno-smeđa, ne crna. Kontrasti (WCAG AA):
+   tekst #efe6d8 na #1a1310 = 14.8:1, tekst-meki #c4b3a2 = 9.0:1,
+   naglasak #e3a585 = 8.7:1, greska #f4a893 = 9.5:1; na povrsini #2c221d sve iznad 7.6:1 */
+html[data-tema='tamna'] {
+  --color-pozadina: #1a1310;
+  --color-pozadina-2: #241b17;
+  --color-povrsina: #2c221d;
+  --color-tekst: #efe6d8;
+  --color-tekst-meki: #c4b3a2;
+  --color-naglasak: #e3a585;
+  --color-rub: #efe6d8;
+  --color-greska: #f4a893;
+  color-scheme: dark;
+}
+html[data-tema='svijetla'] {
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgb(114 52 34 / 0.15);
+    scroll-padding-top: 6rem;
+  }
+  body {
+    @apply bg-pozadina text-tekst font-sans antialiased;
+    transition: background-color 0.3s, color 0.3s;
+    font-feature-settings: "kern", "liga";
+  }
+  h1, h2, h3, h4 {
+    @apply font-display text-balance;
+    font-optical-sizing: auto;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-naglasak);
+    outline-offset: 3px;
+  }
+  .tema-podrum :focus-visible,
+  .na-tamnom :focus-visible {
+    outline-color: var(--color-zlato);
+  }
+  ::selection {
+    background: var(--color-bordo);
+    color: var(--color-krem);
+  }
+}
+
+@utility okvir {
+  @apply mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10;
+}
+@utility gumb {
+  @apply inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap px-6 text-[0.9375rem] font-medium tracking-wide transition-[background-color,color,border-color,transform] duration-300 ease-out-soft active:scale-[0.98];
+}
+@utility gumb-primarni {
+  @apply gumb bg-bordo text-krem hover:bg-bordo-700;
+}
+@utility gumb-svijetli {
+  @apply gumb bg-krem text-bordo-900 hover:bg-zlato-300;
+}
+@utility gumb-obrub {
+  @apply gumb border border-current hover:bg-rub/5;
+}
+@utility gumb-obrub-svijetli {
+  @apply gumb border border-krem/70 text-krem hover:border-krem hover:bg-krem/10;
+}
+@utility poveznica {
+  @apply inline-flex items-center gap-2 font-medium underline decoration-1 underline-offset-[6px] transition-colors hover:decoration-2;
+}
+@utility luk {
+  border-radius: 999px 999px 0 0;
+}
+
+@layer components {
+  .proza p + p {
+    @apply mt-5;
+  }
+  .proza h2 {
+    @apply mt-12 mb-4 text-3xl;
+  }
+  .proza ul {
+    @apply mt-5 space-y-2 pl-5;
+    list-style: square;
+  }
+  .proza li::marker {
+    color: var(--color-naglasak);
+  }
+  .tema-podrum .proza li::marker {
+    color: var(--color-zlato);
+  }
+
+  /* Polja obrazaca: label iznad, greška ispod */
+  .polje {
+    @apply flex flex-col gap-2;
+  }
+  .polje label {
+    @apply text-sm font-medium text-tekst;
+  }
+  .polje input,
+  .polje select,
+  .polje textarea {
+    @apply min-h-12 w-full border border-rub/30 bg-povrsina px-4 py-3 text-base text-tekst transition-colors placeholder:text-tekst-meki/80 hover:border-rub/50 focus:border-naglasak;
+  }
+  .polje textarea {
+    @apply min-h-32 resize-y;
+  }
+  .polje .pomoc {
+    @apply text-sm text-tekst-meki;
+  }
+  .polje .greska {
+    @apply hidden text-sm font-medium text-greska;
+  }
+  .polje[data-neispravno] input,
+  .polje[data-neispravno] select,
+  .polje[data-neispravno] textarea {
+    @apply border-greska;
+  }
+  .polje[data-neispravno] .greska {
+    @apply block;
+  }
+}
+
+/* Početno stanje za reveal animacije: skriva se samo kad JS radi i pokret nije smanjen */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  .js [data-reveal="fade"] {
+    transform: none;
+  }
+  /* Hero ulazi samo pomakom (bez skrivanja), da naslov odmah bude LCP */
+  [data-hero] > * {
+    animation: hero-ulaz 0.9s var(--ease-out-soft) both;
+  }
+  [data-hero] > :nth-child(2) { animation-delay: 0.08s; }
+  [data-hero] > :nth-child(3) { animation-delay: 0.16s; }
+  [data-hero] > :nth-child(4) { animation-delay: 0.24s; }
+  /* Lagani zoom hero fotografije, na compositoru (bez JS-a) */
+  [data-hero-slika] {
+    animation: hero-zoom 1.6s var(--ease-out-soft) both;
+  }
+}
+
+@keyframes hero-ulaz {
+  from {
+    transform: translateY(18px);
+  }
+}
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.06);
+  }
+}
+
+/* Cookie banner je vidljiv odmah pri učitavanju ako privola još nije dana
+   (html[data-privola] postavlja inline skripta u <head>) */
+html[data-privola] #kolacici {
+  display: none;
+}
+/* Banner je u sistemskom fontu: prikazuje se odmah, a zamjena web fonta
+   ne mijenja mu visinu (inače pomak ruba = CLS jer je prikvačen uz dno) */
+#kolacici,
+#kolacici h2 {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Zrno papira kao fiksni sloj, nikad na scroll kontejneru.
+   Samo na većim ekranima: SVG šum je skup za iscrtavanje na slabijim mobitelima. */
+@media (min-width: 1024px) {
+.zrno::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+}

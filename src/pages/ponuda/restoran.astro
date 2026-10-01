@@ -1,0 +1,117 @@
+---
+import { Picture } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+import Osnovni from '../../layouts/Osnovni.astro';
+import Ikona from '../../components/Ikona.astro';
+import SekcijaUpit from '../../components/SekcijaUpit.astro';
+import FotoTraka from '../../components/FotoTraka.astro';
+
+const unos = (await getEntry('ponuda', 'restoran'))!;
+const { Content } = await render(unos);
+const d = unos.data;
+const [kamin, blagovaonica, terasa] = d.galerija;
+
+// Jela izdvojena na postojećoj stranici (buncic.hr/ponuda/gastronomija)
+const jela = [
+  { naziv: 'Juha „Klet Bunčić”', opis: 'Juha od vrganja servirana u kalupu od kruha.' },
+  { naziv: 'Juneći file „Sveti Martin”', opis: 'Serviran na toplom kamenu, za stolom.' },
+  { naziv: 'Sablja „Veseli lovac”', opis: 'Ramsteak, teleći medaljoni i beefsteak s pečenom paprikom i đuveđ rižom, nabodeni na sablju i flambirani.' },
+  { naziv: 'Tava „Klet Bunčić”', opis: 'Naš kućni specijalitet. Pitajte konobara što je danas u tavi.' },
+];
+---
+
+<Osnovni naslov={d.seoNaslov} opis={d.seoOpis} slika={d.naslovnica} tema="podrum" zaglavljePreko>
+  <!-- HERO: podrum sa svodovima, tamno i toplo (ref. Lumier / Goma) -->
+  <section class="relative isolate flex min-h-[92dvh] items-end overflow-hidden">
+    <div class="absolute inset-0 -z-10" data-hero-slika>
+      <Picture
+        src={d.naslovnica!}
+        alt={d.naslovnicaAlt!}
+        formats={['avif', 'webp']}
+        widths={[640, 1000, 1500]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        class="h-full w-full object-cover saturate-[0.8]"
+      />
+    </div>
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-podrum via-podrum/60 to-podrum/30"></div>
+    <div class="okvir grid gap-10 pb-16 pt-32 lg:grid-cols-12 lg:items-end lg:pb-24" data-hero>
+      <h1 class="text-6xl leading-[1.02] tracking-tight md:text-7xl lg:col-span-7 lg:text-8xl">
+        À la carte <em class="block font-normal italic text-zlato">restoran</em>
+      </h1>
+      <div class="lg:col-span-5">
+        <p class="max-w-[42ch] text-lg leading-relaxed text-krem/85">{d.uvod}</p>
+        <dl class="mt-8 grid grid-cols-2 gap-6 border-t border-krem/20 pt-6 text-sm">
+          <div>
+            <dt class="text-krem/65">Nedjelja - četvrtak</dt>
+            <dd class="mt-1 font-display text-2xl">7 - 23 h</dd>
+          </div>
+          <div>
+            <dt class="text-krem/65">Petak i subota</dt>
+            <dd class="mt-1 font-display text-2xl">7 - 4 h</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- JELOVNIK: tipografski popis kućnih specijaliteta -->
+  <section class="okvir py-24 lg:py-32" aria-labelledby="jela-naslov">
+    <div class="grid gap-12 lg:grid-cols-12">
+      <div class="lg:col-span-4" data-reveal>
+        <h2 id="jela-naslov" class="text-4xl leading-[1.1] tracking-tight md:text-5xl">Iz naše kuhinje</h2>
+        <div class="proza mt-6 max-w-[38ch] leading-relaxed text-krem/75"><Content /></div>
+      </div>
+      <ul class="lg:col-span-7 lg:col-start-6" data-reveal-grupa>
+        {
+          jela.map((j) => (
+            <li class="border-b border-krem/15 py-8 first:pt-0" data-reveal>
+              <h3 class="font-display text-3xl md:text-4xl">{j.naziv}</h3>
+              <p class="mt-3 max-w-[52ch] leading-relaxed text-krem/75">{j.opis}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- NEDJELJNI RUČAK: fotografija preko cijele širine s tekstom (mijenja ritam) -->
+  <FotoTraka slika={kamin.slika} alt={kamin.alt} poravnanje="desno" visina="min-h-[80dvh]">
+    <p class="inline-flex items-center gap-2 text-zlato">
+      <Ikona ime="calendar-heart" velicina={22} /> Svake nedjelje
+    </p>
+    <h2 class="mt-5 text-4xl leading-[1.1] tracking-tight md:text-5xl">Nedjeljni ručak uz tamburaše</h2>
+    <p class="mt-6 text-lg leading-relaxed text-krem/85">
+      Osoblje za vaš stol servira predjelo, dvije juhe na izbor i desert, a glavno jelo birate sa švedskog stola. Šef
+      kuhinje je cijelo vrijeme uz vas i rado objasni kako je koji specijalitet pripremljen.
+    </p>
+    <div class="mt-8 flex items-start gap-4 border-t border-krem/20 pt-6">
+      <Ikona ime="music-notes" velicina={28} class="shrink-0 text-zlato" />
+      <p class="leading-relaxed text-krem/85">
+        <strong class="font-medium text-krem">Petkom i subotom</strong> zabava i ples uz domaću zabavnu glazbu i jedan od naših pratećih bendova.
+      </p>
+    </div>
+  </FotoTraka>
+
+  <!-- PROSTOR: dvije fotografije različitih omjera -->
+  <section class="okvir py-24 lg:py-32" aria-label="Prostori restorana">
+    <div class="grid gap-4 md:grid-cols-5" data-reveal-grupa>
+      <figure class="md:col-span-3" data-reveal>
+        <Picture src={blagovaonica.slika} alt={blagovaonica.alt} formats={['avif', 'webp']} widths={[640, 1000]} sizes="(min-width: 768px) 60vw, 100vw" class="aspect-[4/3] w-full object-cover" />
+        <figcaption class="mt-3 text-sm text-krem/70">Blagovaonica</figcaption>
+      </figure>
+      <figure class="md:col-span-2 md:mt-24" data-reveal>
+        <Picture src={terasa.slika} alt={terasa.alt} formats={['avif', 'webp']} widths={[480, 800]} sizes="(min-width: 768px) 40vw, 100vw" class="aspect-[3/4] w-full object-cover" />
+        <figcaption class="mt-3 text-sm text-krem/70">Terasa u zelenilu</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <SekcijaUpit
+    naslov="Rezervirajte stol"
+    opis="Za rezervaciju nazovite ili nam pošaljite poruku s datumom, vremenom i brojem osoba."
+    vrsta="opci"
+    tamno
+  />
+</Osnovni>

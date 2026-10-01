@@ -1,0 +1,80 @@
+---
+/*
+  Karta s uputama za dolazak. OpenStreetMap embed (bez kolačića za praćenje)
+  učitava se tek na klik (fasada): iframe vuče vlastite skripte i pločice koje
+  na mobitelu usporavaju prvo iscrtavanje, a ovako se ništa ne šalje OSM-u
+  bez radnje posjetitelja. Koordinate iz postavke.json (geokodirano preko OSM Nominatima).
+*/
+import Ikona from './Ikona.astro';
+
+interface Props {
+  naziv: string;
+  adresa: string;
+  koordinate: [number, number];
+  upute?: string[];
+}
+
+const { naziv, adresa, koordinate, upute = [] } = Astro.props;
+const [lat, lon] = koordinate;
+const d = 0.012;
+const bbox = [lon - d * 1.6, lat - d, lon + d * 1.6, lat + d].map((n) => n.toFixed(5)).join('%2C');
+const embed = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lon}`;
+const google = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+---
+
+<div class="grid gap-8 lg:grid-cols-12 lg:gap-12">
+  <div class="lg:col-span-4">
+    <h3 class="font-display text-3xl">{naziv}</h3>
+    <p class="mt-3 flex gap-3 text-tekst-meki"><Ikona ime="map-pin" velicina={20} class="mt-0.5 shrink-0 text-naglasak" />{adresa}</p>
+    {
+      upute.length > 0 && (
+        <ul class="mt-6 space-y-3 text-tekst-meki">
+          {upute.map((u) => (
+            <li class="flex gap-3">
+              <Ikona ime="arrow-right" velicina={18} class="mt-1 shrink-0 text-naglasak" />
+              {u}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <a href={google} target="_blank" rel="noopener" class="gumb-primarni mt-8">
+      <Ikona ime="navigation-arrow" velicina={18} /> Upute za navigaciju
+    </a>
+  </div>
+  <div class="karta-okvir relative aspect-[4/3] overflow-hidden bg-pozadina-2 lg:col-span-8 lg:aspect-[16/9]" data-karta={embed} data-naslov={`Karta: ${naziv}, ${adresa}`}>
+    <button type="button" class="karta-fasada group absolute inset-0 flex w-full flex-col items-center justify-center gap-4 p-6 text-center" data-karta-gumb>
+      <span class="grid size-16 place-items-center rounded-full bg-pozadina text-naglasak shadow-sm transition-transform duration-300 ease-out-soft group-hover:-translate-y-0.5">
+        <Ikona ime="map-trifold" velicina={30} />
+      </span>
+      <span class="gumb-obrub">Prikaži kartu</span>
+      <span class="max-w-[36ch] text-sm text-tekst-meki">Karta se učitava s OpenStreetMap.org</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-karta]').forEach((okvir) => {
+    okvir.querySelector('[data-karta-gumb]')?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = okvir.dataset.karta!;
+      iframe.title = okvir.dataset.naslov!;
+      iframe.referrerPolicy = 'no-referrer';
+      iframe.className = 'karta absolute inset-0 h-full w-full border-0';
+      okvir.replaceChildren(iframe);
+      iframe.focus();
+    });
+  });
+</script>
+
+<style>
+  .karta-fasada:focus-visible {
+    outline: 2px solid var(--color-naglasak);
+    outline-offset: -4px;
+  }
+
+  /* U tamnoj temi karta se prigušuje da ne bljesne bijelo */
+  :global(html[data-tema='tamna'] .karta) {
+    filter: brightness(0.8) contrast(1.05) saturate(0.8);
+  }
+</style>

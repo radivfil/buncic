@@ -1,0 +1,101 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Ikona from './Ikona.astro';
+
+const postavke = (await getEntry('postavke', 'opce'))!.data;
+const ponuda = (await getCollection('ponuda')).sort((a, b) => a.data.redoslijed - b.data.redoslijed);
+const [klet, koliba, uprava] = postavke.lokacije;
+const tel = (broj: string) => `tel:${broj.replace(/[^\d+]/g, '')}`;
+const godina = new Date().getFullYear();
+---
+
+<footer class="na-tamnom relative bg-podrum text-krem/80">
+  <div class="okvir grid gap-12 py-16 md:grid-cols-12 md:gap-8 lg:py-24">
+    <div class="md:col-span-12 lg:col-span-4">
+      <a href="/" class="inline-flex items-center gap-4" aria-label="Obitelj Bunčić, početna stranica">
+        <img src="/logo.svg" alt="" width="70" height="80" class="h-20 w-auto" loading="lazy" />
+        <span class="font-display text-2xl leading-tight text-krem" translate="no">Obitelj Bunčić</span>
+      </a>
+      <p class="mt-6 max-w-[34ch] leading-relaxed">
+        Obiteljsko imanje usred vinograda i voćnjaka Martin brega, nadomak Zagreba. Gostima otvoreno od 1994.
+      </p>
+      <a href="/kontakt" class="gumb-svijetli mt-8">Pošaljite upit</a>
+    </div>
+
+    <div class="md:col-span-4 lg:col-span-3">
+      <h2 class="font-display text-xl text-krem">{klet.naziv}</h2>
+      <address class="mt-4 space-y-2 not-italic">
+        <a href={postavke.kartaUrl} class="flex gap-3 hover:text-krem" rel="noopener" target="_blank">
+          <Ikona ime="map-pin" velicina={20} class="mt-0.5 shrink-0 text-zlato" />
+          {klet.adresa}
+        </a>
+        {
+          klet.telefoni.slice(0, 2).map((t) => (
+            <a href={tel(t)} class="flex gap-3 hover:text-krem">
+              <Ikona ime="phone" velicina={20} class="mt-0.5 shrink-0 text-zlato" />
+              {t}
+            </a>
+          ))
+        }
+        <a href={`mailto:${postavke.email}`} class="flex gap-3 hover:text-krem">
+          <Ikona ime="envelope-simple" velicina={20} class="mt-0.5 shrink-0 text-zlato" />
+          {postavke.email}
+        </a>
+      </address>
+      <ul class="mt-5 space-y-1 text-sm">
+        {klet.radnoVrijeme.map((r) => <li>{r}</li>)}
+      </ul>
+    </div>
+
+    <div class="md:col-span-4 lg:col-span-2">
+      <h2 class="font-display text-xl text-krem">{koliba.naziv}</h2>
+      <address class="mt-4 space-y-2 not-italic">
+        <p class="flex gap-3">
+          <Ikona ime="map-pin" velicina={20} class="mt-0.5 shrink-0 text-zlato" />
+          {koliba.adresa}
+        </p>
+        {
+          koliba.telefoni.map((t) => (
+            <a href={tel(t)} class="flex gap-3 hover:text-krem">
+              <Ikona ime="phone" velicina={20} class="mt-0.5 shrink-0 text-zlato" />
+              {t}
+            </a>
+          ))
+        }
+      </address>
+      <ul class="mt-5 space-y-1 text-sm">
+        {koliba.radnoVrijeme.map((r) => <li>{r}</li>)}
+      </ul>
+    </div>
+
+    <nav aria-label="Poveznice u podnožju" class="md:col-span-4 lg:col-span-3">
+      <h2 class="font-display text-xl text-krem">Stranice</h2>
+      <ul class="mt-4 grid grid-cols-1 gap-y-2 xs:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 lg:gap-x-6">
+        {
+          ponuda.map((p) => (
+            <li>
+              <a href={`/ponuda/${p.id}`} class="hover:text-krem">
+                {p.data.nazivIzbornik}
+              </a>
+            </li>
+          ))
+        }
+        <li><a href="/novosti" class="hover:text-krem">Novosti i događanja</a></li>
+        <li><a href="/kontakt" class="hover:text-krem">Kontakt</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="border-t border-krem/10">
+    <div class="okvir flex flex-col gap-4 py-8 text-sm text-krem/70 lg:flex-row lg:items-center lg:justify-between">
+      <p>
+        {postavke.tvrtka.naziv}, vl. {postavke.tvrtka.vlasnica}. OIB {postavke.tvrtka.oib}. Uprava: {uprava.adresa}.
+      </p>
+      <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <a href="/pravila-privatnosti" class="inline-flex min-h-11 items-center hover:text-krem">Pravila privatnosti</a>
+        <button type="button" class="inline-flex min-h-11 items-center hover:text-krem" data-kolacici-postavke>Postavke kolačića</button>
+        <span>&copy; {godina} Obitelj Bunčić</span>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "klasicni",
+    "naziv": "Klasični svadbeni meni",
+    "cijenaOd": 55,
+    "jedinica": "po osobi",
+    "istaknuto": false,
+    "stavke": [
+      "Hladno predjelo",
+      "Svatovska juha",
+      "Glavno jelo: tri vrste mesa, dva priloga, umak",
+      "Druga večera: odojak i janjetina",
+      "Gulaš",
+      "Neograničeno domaće piće"
+    ],
+    "redoslijed": 1,
+    "potvrdeno": false,
+    "napomena": "Sastav menija preuzet sa stare stranice buncic.hr (2008.). [UNIJETI STVARNI SADRŽAJ] cijena je primjer."
+  },
+  {
+    "id": "svecani",
+    "naziv": "Svečani paket",
+    "cijenaOd": 75,
+    "jedinica": "po osobi",
+    "istaknuto": true,
+    "stavke": [
+      "Sve iz klasičnog menija",
+      "Slatki švedski stol naših slastičara",
+      "Svadbena torta po želji",
+      "Dekoracija dvorane i stolova",
+      "Soba za mladence prve noći"
+    ],
+    "redoslijed": 2,
+    "potvrdeno": false,
+    "napomena": "[UNIJETI STVARNI SADRŽAJ] sastav paketa i cijena su primjer; usluge postoje na postojećoj stranici, paketiranje nije potvrđeno"
+  },
+  {
+    "id": "po-mjeri",
+    "naziv": "Po mjeri",
+    "cijenaOd": null,
+    "jedinica": "prema dogovoru",
+    "istaknuto": false,
+    "stavke": [
+      "Meni sastavljen s našim šefom kuhinje",
+      "Obred vjenčanja na otvorenom",
+      "Mladenački buket, kitice, reveri",
+      "Dekoracija automobila i crkve",
+      "Smještaj za goste na imanju"
+    ],
+    "redoslijed": 3,
+    "potvrdeno": false,
+    "napomena": "Usluge preuzete s postojeće stranice; paketiranje je prijedlog"
+  }
+]

@@ -1,0 +1,319 @@
+---
+import { Picture } from 'astro:assets';
+import { getCollection, getEntry } from 'astro:content';
+import Osnovni from '../layouts/Osnovni.astro';
+import Ikona from '../components/Ikona.astro';
+import KarticaNovosti from '../components/KarticaNovosti.astro';
+
+// ZAMIJENITI PRIJE LAUNCHA: sve fotografije na početnoj su snimke mobitelom; hero ima samo 960 px (vidi FOTOGRAFIJE.md)
+import hero from '../assets/images/pocetna/hero-mladenci-sjenica.jpg';
+import zgrada from '../assets/images/pocetna/klet-zgrada.jpg';
+import imanje from '../assets/images/imanje/panorama.jpg';
+import park from '../assets/images/imanje/bunar-sjenica.jpg';
+
+const postavke = (await getEntry('postavke', 'opce'))!.data;
+const ponuda = (await getCollection('ponuda')).sort((a, b) => a.data.redoslijed - b.data.redoslijed);
+const p = Object.fromEntries(ponuda.map((e) => [e.id, e]));
+const novosti = (await getCollection('novosti')).sort((a, b) => +b.data.datum - +a.data.datum).slice(0, 3);
+
+const godisnjiRitam = [
+  { kada: 'Siječanj', naslov: 'Vincekovo', opis: 'Blagoslov vinograda i prvi veliki blagdan u godini.' },
+  { kada: 'Svake nedjelje', naslov: 'Nedjeljni ručak', opis: 'Švedski stol, dvije juhe na izbor i tamburaši za stolom.' },
+  { kada: 'Petkom i subotom', naslov: 'Živa glazba', opis: 'Domaća zabavna glazba i ples uz naše prateće bendove.' },
+  { kada: 'Rujan', naslov: 'Berba', opis: 'Vrijeme kad se imanje najviše veseli, u vinogradu i za stolom.' },
+  { kada: 'Studeni', naslov: 'Martinje', opis: 'Tradicionalno krštenje mošta, uz jela koja idu uz mlado vino.' },
+  { kada: 'Prosinac', naslov: 'Domjenci i doček', opis: 'Božićni domjenci za tvrtke i doček Nove godine u Kleti.' },
+];
+
+const shema = {
+  '@context': 'https://schema.org',
+  '@type': ['Restaurant', 'LodgingBusiness'],
+  name: 'Klet obitelji Bunčić',
+  alternateName: 'Obitelj Bunčić',
+  url: 'https://buncic.hr',
+  logo: 'https://buncic.hr/logo.svg',
+  telephone: '+38512781133',
+  email: postavke.email,
+  foundingDate: '1994',
+  servesCuisine: ['Domaća kuhinja', 'Lovački specijaliteti', 'Jela ispod peke'],
+  numberOfRooms: 40,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Šaškovečka 182',
+    postalCode: '10370',
+    addressLocality: 'Dugo Selo',
+    addressCountry: 'HR',
+  },
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'], opens: '07:00', closes: '23:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Friday', 'Saturday'], opens: '07:00', closes: '04:00' },
+  ],
+};
+---
+
+<Osnovni
+  naslov="Obitelj Bunčić | Vjenčanja, restoran i smještaj u Dugom Selu"
+  opis="Obiteljsko imanje Bunčić na Martin bregu od 1994. Vjenčanja, proslave, domaća kuhinja, catering i 40 soba usred vinograda, nadomak Zagreba."
+  zaglavljePreko
+  shema={shema}
+>
+  <!-- HERO: velika emotivna fotografija, naslov preko nje (ref. Sundance Estate) -->
+  <section class="relative isolate flex min-h-[100dvh] items-end overflow-hidden bg-podrum text-krem">
+    <div class="absolute inset-0 -z-10" data-hero-slika>
+      <Picture
+        src={hero}
+        alt="Mladenci u zagrljaju ispred drvene sjenice, iza njih vinograd Martin brega"
+        formats={['avif', 'webp']}
+        widths={[640, 960]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        class="h-full w-full object-cover object-[62%_40%]"
+      />
+    </div>
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-podrum/90 via-podrum/35 to-podrum/10"></div>
+    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-podrum/60 via-transparent to-transparent max-md:bg-none max-md:bg-podrum/35"></div>
+
+    <div class="okvir pb-16 pt-32 md:pb-20 lg:pb-24" data-hero>
+      <p class="text-sm font-medium uppercase tracking-[0.2em] text-zlato">Klet Bunčić, Dugo Selo. Od 1994.</p>
+      <h1 class="mt-5 max-w-[16ch] text-[2.75rem] leading-[1.05] tracking-tight xs:text-5xl md:text-6xl lg:text-7xl">
+        Vaši najvažniji dani, <em class="font-normal italic text-zlato-300">u našem domu.</em>
+      </h1>
+      <p class="mt-6 max-w-[46ch] text-lg leading-relaxed text-krem/90 md:text-xl">
+        Vjenčanja, proslave i domaća kuhinja na obiteljskom imanju usred vinograda Martin brega, nadomak Zagreba.
+      </p>
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a href="/kontakt" class="gumb-svijetli">Pošaljite upit</a>
+        <a href="#ponuda" class="gumb-obrub-svijetli">Pogledajte ponudu</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIČA: asimetrični raspored, lučna fotografija kao potpis imanja -->
+  <section class="okvir grid items-center gap-12 py-24 md:grid-cols-12 md:gap-10 lg:py-32">
+    <div class="md:col-span-7 lg:col-span-6 lg:col-start-1" data-reveal-grupa>
+      <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>
+        Više od trideset godina toplog obiteljskog gostoprimstva.
+      </h2>
+      <p class="mt-8 max-w-[58ch] text-lg leading-relaxed text-tekst-meki" data-reveal>
+        Od 1994. godine, kada smo otvorili obiteljsko imanje, gostima nudimo toplu dobrodošlicu. Kod nas ćete uživati u jednostavnosti darova prirode i opustiti se kao da ste stotinama kilometara od gradske vreve, a opet nadomak Zagreba.
+      </p>
+      <dl class="mt-12 grid max-w-xl grid-cols-3 gap-6 tabular-nums border-t border-rub/15 pt-8" data-reveal>
+        <div>
+          <dt class="text-sm text-tekst-meki">Otvoreno od</dt>
+          <dd class="mt-1 font-display text-4xl text-naglasak md:text-5xl">1994.</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-tekst-meki">Soba za goste</dt>
+          <dd class="mt-1 font-display text-4xl text-naglasak md:text-5xl">40</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-tekst-meki">Lokacije</dt>
+          <dd class="mt-1 font-display text-4xl text-naglasak md:text-5xl">2</dd>
+        </div>
+      </dl>
+    </div>
+    <div class="relative md:col-span-5 lg:col-span-5 lg:col-start-8">
+      <div class="luk relative aspect-[4/5] overflow-hidden bg-pozadina-2" data-reveal="fade">
+        <Picture
+          src={zgrada}
+          alt="Pročelje Kleti obitelji Bunčić od crvene opeke s drvenim balkonima"
+          formats={['avif', 'webp']}
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 768px) 40vw, 100vw"
+          class="h-full w-full object-cover object-[30%_50%]"
+        />
+      </div>
+      <div class="absolute -bottom-10 -left-6 hidden w-[46%] border-8 border-pozadina md:block lg:-left-16" data-reveal>
+        <Picture
+          src={park}
+          alt="Drvena sjenica s bunarom i cvijećem ispred Kleti"
+          formats={['avif', 'webp']}
+          widths={[400, 640]}
+          sizes="20vw"
+          class="aspect-square h-full w-full object-cover"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- PONUDA: bento s različitim veličinama ćelija, 6 stavki = 6 ćelija -->
+  <section id="ponuda" class="bg-pozadina-2/60 py-24 lg:py-32">
+    <div class="okvir">
+      <h2 class="max-w-[20ch] text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>
+        Sve što trebate za dan koji se pamti
+      </h2>
+
+      <div class="mt-14 grid grid-cols-1 gap-4 md:grid-cols-6 lg:grid-cols-12 lg:grid-rows-[300px_300px_280px]" data-reveal-grupa>
+        {
+          [
+            { id: 'vjencanja', klasa: 'md:col-span-6 lg:col-span-7 lg:row-span-2 min-h-[420px]' },
+            { id: 'restoran', klasa: 'md:col-span-3 lg:col-span-5 min-h-[300px]' },
+            { id: 'catering', klasa: 'md:col-span-3 lg:col-span-5 min-h-[300px]' },
+            { id: 'proslave', klasa: 'md:col-span-3 lg:col-span-5 min-h-[280px]' },
+            { id: 'smjestaj', klasa: 'md:col-span-3 lg:col-span-4 min-h-[280px]' },
+          ].map(({ id, klasa }) => (
+            <a
+              href={`/ponuda/${id}`}
+              class:list={['group relative isolate flex flex-col justify-end overflow-hidden bg-podrum p-6 text-krem md:p-8', klasa]}
+              data-kartica
+              data-reveal
+            >
+              <div class="absolute inset-0 -z-10" data-kartica-slika>
+                <Picture
+                  src={p[id].data.naslovnica!}
+                  alt=""
+                  formats={['avif', 'webp']}
+                  widths={[480, 800, 1200]}
+                  sizes={id === 'vjencanja' ? '(min-width: 1024px) 58vw, 100vw' : '(min-width: 1024px) 40vw, (min-width: 768px) 50vw, 100vw'}
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <div class="absolute inset-0 -z-10 bg-gradient-to-t from-podrum/90 via-podrum/30 to-transparent" />
+              <h3 class:list={['font-display leading-tight', id === 'vjencanja' ? 'text-4xl md:text-5xl' : 'text-3xl']}>
+                {p[id].data.nazivIzbornik}
+              </h3>
+              <p class="mt-2 flex items-center gap-2 text-krem/90">
+                {p[id].data.opisIzbornik}
+                <span data-kartica-strelica class="inline-flex">
+                  <Ikona ime="arrow-right" velicina={18} />
+                </span>
+              </p>
+            </a>
+          ))
+        }
+        <a
+          href="/ponuda/ribarska-koliba"
+          class="group relative flex min-h-[280px] flex-col justify-between bg-bordo p-6 text-krem md:col-span-6 md:p-8 lg:col-span-3"
+          data-kartica
+          data-reveal
+        >
+          <Ikona ime="fish-simple" velicina={40} class="text-zlato" />
+          <div>
+            <h3 class="font-display text-3xl leading-tight">Ribarska koliba</h3>
+            <p class="mt-2 flex items-center gap-2 text-krem/90">
+              Rugvička ulica 217
+              <span data-kartica-strelica class="inline-flex"><Ikona ime="arrow-right" velicina={18} /></span>
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- KOLIKO GOSTIJU: ulaz u potpisni modul na stranici Vjenčanja -->
+  <section class="na-tamnom bg-bordo-900 text-krem">
+    <form action="/ponuda/vjencanja/#dvorane" method="get" class="okvir flex flex-col gap-8 py-14 md:flex-row md:items-end md:justify-between lg:py-16" data-reveal>
+      <div>
+        <h2 class="text-3xl leading-tight tracking-tight md:text-4xl">Koliko gostiju očekujete?</h2>
+        <p class="mt-3 max-w-[44ch] text-krem/80">Upišite broj i pokazat ćemo vam dvoranu koja odgovara vašem slavlju.</p>
+      </div>
+      <div class="flex flex-wrap items-end gap-3">
+        <label class="flex flex-col gap-2 text-sm text-krem/80">
+          Broj gostiju
+          <input name="gosti" type="number" min="20" max="650" value="120" inputmode="numeric" class="min-h-12 w-36 border border-krem/40 bg-transparent px-4 font-display text-3xl tabular-nums text-krem" />
+        </label>
+        <button type="submit" class="gumb-svijetli">Pronađite dvoranu</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- GODINA NA IMANJU: vodoravni scroll-snap niz -->
+  <section class="py-24 lg:py-32" aria-labelledby="godina-naslov">
+    <div class="okvir">
+      <h2 id="godina-naslov" class="max-w-[22ch] text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>
+        Imanje kroz godinu
+      </h2>
+      <p class="mt-5 max-w-[52ch] text-lg leading-relaxed text-tekst-meki" data-reveal>
+        Blagdane i vinske običaje slavimo velikim proslavama. Pridružite nam se.
+      </p>
+    </div>
+    <div class="mt-12 overflow-x-auto overscroll-x-contain [scrollbar-width:thin]" tabindex="0" aria-label="Događanja kroz godinu, pomičite vodoravno">
+      <ol class="okvir flex snap-x snap-mandatory gap-4 pb-4" data-reveal-grupa>
+        {
+          godisnjiRitam.map((d) => (
+            <li class="w-[78vw] max-w-[320px] shrink-0 snap-start border-t-2 border-naglasak bg-pozadina-2/70 p-7 xs:w-[280px]" data-reveal>
+              <p class="text-sm font-medium text-naglasak">{d.kada}</p>
+              <h3 class="mt-6 font-display text-2xl">{d.naslov}</h3>
+              <p class="mt-3 leading-relaxed text-tekst-meki">{d.opis}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- PRIRODA: fotografija preko cijele širine s tekstom u okviru -->
+  <section class="relative isolate overflow-hidden">
+    <div class="absolute inset-0 -z-10">
+      <Picture
+        src={imanje}
+        alt="Imanje s crvenim krovovima na brijegu, okruženo vinogradima i drvećem"
+        formats={['avif', 'webp']}
+        widths={[640, 1200, 1920]}
+        sizes="100vw"
+        class="h-full w-full object-cover"
+      />
+    </div>
+    <div class="absolute inset-0 -z-10 bg-podrum/45 md:bg-gradient-to-r md:from-podrum/10 md:via-podrum/10 md:to-podrum/70"></div>
+    <div class="okvir flex min-h-[560px] items-center py-20 md:justify-end lg:min-h-[640px]">
+      <div class="max-w-md bg-pozadina p-8 md:p-10" data-reveal>
+        <h2 class="text-3xl leading-tight tracking-tight md:text-4xl">Nadomak Zagreba, a daleko od gradske vreve</h2>
+        <p class="mt-5 leading-relaxed text-tekst-meki">
+          Prošećite šumom, istražite okolicu na konju ili provedite popodne s djecom na igralištu i u malom zoološkom
+          vrtu. Za one koji ostaju duže, tu je 40 soba.
+        </p>
+        <a href="/ponuda/smjestaj" class="poveznica mt-7 text-naglasak">
+          Smještaj na imanju <Ikona ime="arrow-right" velicina={18} />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOVOSTI: jedna istaknuta + dvije u popisu -->
+  <section class="okvir py-24 lg:py-32" aria-labelledby="novosti-naslov">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <h2 id="novosti-naslov" class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Novosti i događanja</h2>
+      <a href="/novosti" class="poveznica text-naglasak">Sve novosti <Ikona ime="arrow-right" velicina={18} /></a>
+    </div>
+    <div class="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-12" data-reveal-grupa>
+      <div class="lg:col-span-7" data-reveal>
+        <KarticaNovosti objava={novosti[0]} velika />
+      </div>
+      <div class="flex flex-col gap-8 lg:col-span-5">
+        {novosti.slice(1).map((n) => <div data-reveal><KarticaNovosti objava={n} vodoravna /></div>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- DOLAZAK: kontakt i radno vrijeme -->
+  <section class="na-tamnom bg-bordo-900 text-krem">
+    <div class="okvir grid gap-12 py-20 md:grid-cols-2 lg:py-28">
+      <div data-reveal>
+        <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl">Dođite nas upoznati</h2>
+        <p class="mt-6 max-w-[44ch] text-lg leading-relaxed text-krem/85">
+          Nazovite nas ili pošaljite upit. Rado ćemo vam pokazati dvorane i imanje prije nego što odlučite.
+        </p>
+        <div class="mt-9 flex flex-wrap gap-3">
+          <a href="/kontakt" class="gumb-svijetli">Pošaljite upit</a>
+          <a href="tel:+38512781133" class="gumb-obrub-svijetli"><Ikona ime="phone" velicina={18} /> 01 2781-133</a>
+        </div>
+      </div>
+      <dl class="grid gap-8 self-end sm:grid-cols-2" data-reveal>
+        <div>
+          <dt class="font-display text-xl text-zlato">Adresa</dt>
+          <dd class="mt-2 leading-relaxed text-krem/85">
+            {postavke.lokacije[0].adresa}<br />
+            <a href={postavke.kartaUrl} target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-krem">Otvori u Google kartama</a>
+          </dd>
+        </div>
+        <div>
+          <dt class="font-display text-xl text-zlato">Radno vrijeme</dt>
+          <dd class="mt-2 leading-relaxed text-krem/85">
+            {postavke.lokacije[0].radnoVrijeme.slice(0, 2).map((r) => <span class="block">{r}</span>)}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+</Osnovni>

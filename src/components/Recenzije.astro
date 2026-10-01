@@ -1,0 +1,51 @@
+---
+/*
+  Iskustva mladenaca. Podaci: src/content/recenzije/recenzije.json
+  NAMJERNO nema izmišljenih citata: dok klijent ne dostavi stvarne recenzije
+  (uz dopuštenje mladenaca), kartice prikazuju vidljiv placeholder.
+*/
+import { getCollection } from 'astro:content';
+import DemoOznaka from './DemoOznaka.astro';
+
+const recenzije = await getCollection('recenzije');
+const [prva, ...ostale] = recenzije;
+---
+
+<section class="okvir py-24 lg:py-32" aria-labelledby="recenzije-naslov">
+  <h2 id="recenzije-naslov" class="max-w-[20ch] text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Iskustva mladenaca</h2>
+  <div class="mt-14 grid gap-10 lg:grid-cols-12" data-reveal-grupa>
+    {
+      prva && (
+        <figure class:list={['lg:col-span-7', !prva.data.potvrdeno && 'recenzija-primjer p-8']} data-reveal>
+          <DemoOznaka potvrdeno={prva.data.potvrdeno} tekst="Unijeti stvarnu recenziju" class="mb-5" />
+          <blockquote class="font-display text-3xl leading-snug md:text-4xl">
+            <p>„{prva.data.citat}”</p>
+          </blockquote>
+          <figcaption class="mt-6 text-tekst-meki">
+            <span class="font-medium text-tekst">{prva.data.imena}</span>, vjenčanje {prva.data.datum}
+          </figcaption>
+        </figure>
+      )
+    }
+    <div class="flex flex-col gap-8 lg:col-span-5">
+      {
+        ostale.map((r) => (
+          <figure class:list={['border-t border-rub/15 pt-6', !r.data.potvrdeno && 'recenzija-primjer p-6']} data-reveal>
+            <blockquote class="text-lg leading-relaxed">
+              <p>„{r.data.citat}”</p>
+            </blockquote>
+            <figcaption class="mt-4 text-sm text-tekst-meki">
+              <span class="font-medium text-tekst">{r.data.imena}</span>, vjenčanje {r.data.datum}
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .recenzija-primjer {
+    border: 1px dashed color-mix(in srgb, var(--color-rub) 30%, transparent);
+  }
+</style>

@@ -1,0 +1,153 @@
+---
+import { Picture } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+import Osnovni from '../../layouts/Osnovni.astro';
+import SekcijaUpit from '../../components/SekcijaUpit.astro';
+import Ikona from '../../components/Ikona.astro';
+
+const unos = (await getEntry('ponuda', 'catering'))!;
+const { Content } = await render(unos);
+const d = unos.data;
+
+const prigode = ['Svadbe', 'Ispraćaji mladenaca', 'Krštenja', 'Rođendani', 'Poslovni događaji', 'Obiteljska slavlja'];
+
+// Sadržaj preuzet iz objave "Catering za sve prigode" na postojećoj stranici
+const koraci = [
+  { naslov: 'Odaberite stil', opcije: ['Finger food', 'Buffet', 'Topla jela', 'Kombinacija'] },
+  { naslov: 'Odaberite okuse', opcije: ['Slatko', 'Slano', 'Tradicionalno', 'Moderno'] },
+  { naslov: 'Personalizirajte', opcije: ['Kanapei', 'Mini burgeri', 'Narezci', 'Domaće slastice'] },
+];
+const [buffet, slastice, terasa] = d.galerija;
+---
+
+<Osnovni naslov={d.seoNaslov} opis={d.seoOpis} slika={d.naslovnica} tema="podrum">
+  <!-- HERO: tamna podloga, krupna fotografija hrane (ref. Lumier / Goma) -->
+  <section class="relative overflow-hidden">
+    <div class="grid lg:min-h-[calc(100dvh-5rem)] lg:grid-cols-12">
+      <div class="okvir flex flex-col justify-center py-16 lg:col-span-6 lg:py-20 lg:pr-12 xl:pl-[max(2.5rem,calc((100vw-1320px)/2+2.5rem))]" data-hero>
+        <h1 class="text-6xl leading-[1.02] tracking-tight md:text-7xl">
+          Catering <em class="block font-normal italic text-zlato">za sve prigode</em>
+        </h1>
+        <p class="mt-8 max-w-[44ch] text-lg leading-relaxed text-krem/80">{d.uvod}</p>
+        <div class="mt-10 flex flex-wrap gap-3">
+          <a href="#upit" class="gumb-svijetli">Zatražite ponudu</a>
+        </div>
+      </div>
+      <div class="relative min-h-[360px] lg:col-span-6" data-hero-slika>
+        <Picture
+          src={d.naslovnica!}
+          alt={d.naslovnicaAlt!}
+          formats={['avif', 'webp']}
+          widths={[640, 1080]}
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          loading="eager"
+          fetchpriority="high"
+          class="absolute inset-0 h-full w-full object-cover"
+        />
+        <div class="absolute inset-0 bg-gradient-to-r from-podrum/60 via-transparent to-transparent max-lg:bg-gradient-to-t"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAKA PRIGODA: jedini marquee na stranici -->
+  <section class="relative overflow-hidden border-y border-zlato/20 py-6" aria-label="Prigode za koje pripremamo catering">
+    <button type="button" class="absolute right-2 top-1/2 z-[1] inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center bg-podrum/80 text-krem hover:text-zlato motion-reduce:hidden" aria-pressed="false" aria-label="Zaustavi pomičnu traku" data-traka-gumb>
+      <Ikona ime="pause" velicina={20} class="ikona-pauza" />
+      <Ikona ime="play" velicina={20} class="ikona-play hidden" />
+    </button>
+    <ul class="traka flex w-max whitespace-nowrap font-display text-3xl text-krem md:text-5xl">
+      {
+        [...prigode, ...prigode].map((p, i) => (
+          <li class="flex items-center gap-12 pr-12" aria-hidden={i >= prigode.length ? 'true' : undefined}>
+            {p}
+            <span class="h-2 w-2 rotate-45 bg-zlato" aria-hidden="true" />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- KAKO SLAŽEMO MENI: tri reda, bez kartica -->
+  <section class="okvir py-24 lg:py-32">
+    <div class="grid gap-10 lg:grid-cols-12">
+      <div class="lg:col-span-4" data-reveal>
+        <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl">Meni koji slažete s nama</h2>
+        <div class="proza mt-6 max-w-[40ch] leading-relaxed text-krem/75"><Content /></div>
+      </div>
+      <ol class="lg:col-span-7 lg:col-start-6" data-reveal-grupa>
+        {
+          koraci.map((k, i) => (
+            <li class="grid gap-5 border-t border-krem/15 py-9 sm:grid-cols-[4rem_1fr] sm:gap-8" data-reveal>
+              <span class="font-display text-5xl leading-none text-zlato" aria-hidden="true">{i + 1}</span>
+              <div>
+                <h3 class="font-display text-3xl">{k.naslov}</h3>
+                <ul class="mt-5 flex flex-wrap gap-2">
+                  {k.opcije.map((o) => (
+                    <li class="border border-krem/25 px-4 py-2 text-krem/85">{o}</li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- FOTOGRAFIJE: asimetrični raspored tri slike -->
+  <section class="okvir pb-24 lg:pb-32" aria-label="Fotografije cateringa">
+    <div class="grid gap-4 md:grid-cols-12 md:grid-rows-[280px_280px]" data-reveal-grupa>
+      <div class="overflow-hidden md:col-span-7 md:row-span-2" data-reveal>
+        <Picture src={buffet.slika} alt={buffet.alt} formats={['avif', 'webp']} widths={[640, 960, 1400]} sizes="(min-width: 768px) 58vw, 100vw" class="aspect-[4/3] h-full w-full object-cover md:aspect-auto" />
+      </div>
+      <div class="overflow-hidden md:col-span-5" data-reveal>
+        <Picture src={slastice.slika} alt={slastice.alt} formats={['avif', 'webp']} widths={[480, 800]} sizes="(min-width: 768px) 40vw, 100vw" class="aspect-[4/3] h-full w-full object-cover md:aspect-auto" />
+      </div>
+      <div class="overflow-hidden md:col-span-5" data-reveal>
+        <Picture src={terasa.slika} alt={terasa.alt} formats={['avif', 'webp']} widths={[480, 800]} sizes="(min-width: 768px) 40vw, 100vw" class="aspect-[4/3] h-full w-full object-cover md:aspect-auto" />
+      </div>
+    </div>
+  </section>
+
+  <SekcijaUpit
+    naslov="Zamislite proslavu. Detalje prepustite nama."
+    opis="Opišite događaj, lokaciju i broj gostiju. Pripremit ćemo prijedlog menija i ponudu."
+    vrsta="dogadjaj"
+    prigoda="Catering na vašoj lokaciji"
+    tamno
+  />
+</Osnovni>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .traka {
+      animation: traka 40s linear infinite;
+    }
+    .traka:hover,
+    .traka[data-pauza] {
+      animation-play-state: paused;
+    }
+  }
+  [data-traka-gumb][aria-pressed='true'] :global(.ikona-pauza) {
+    display: none;
+  }
+  [data-traka-gumb][aria-pressed='true'] :global(.ikona-play) {
+    display: block;
+  }
+  @keyframes traka {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>
+
+<script>
+  const gumb = document.querySelector<HTMLButtonElement>('[data-traka-gumb]');
+  const traka = document.querySelector<HTMLElement>('.traka');
+  gumb?.addEventListener('click', () => {
+    const pauza = gumb.getAttribute('aria-pressed') !== 'true';
+    gumb.setAttribute('aria-pressed', String(pauza));
+    gumb.setAttribute('aria-label', pauza ? 'Pokreni pomičnu traku' : 'Zaustavi pomičnu traku');
+    traka?.toggleAttribute('data-pauza', pauza);
+  });
+</script>

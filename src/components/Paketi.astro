@@ -1,0 +1,60 @@
+---
+/* Okvirni paketi s cijenom "od X € po osobi". Podaci: src/content/paketi/paketi.json */
+import { getCollection } from 'astro:content';
+import Ikona from './Ikona.astro';
+import DemoOznaka from './DemoOznaka.astro';
+
+const paketi = (await getCollection('paketi')).sort((a, b) => a.data.redoslijed - b.data.redoslijed);
+const eur = new Intl.NumberFormat('hr-HR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+---
+
+<section class="bg-pozadina-2/60 py-24 lg:py-32" aria-labelledby="paketi-naslov">
+  <div class="okvir">
+    <h2 id="paketi-naslov" class="max-w-[20ch] text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Okvirni paketi</h2>
+    <p class="mt-5 max-w-[56ch] text-lg leading-relaxed text-tekst-meki" data-reveal>
+      Cijene su okvirne i ovise o datumu, broju gostiju i odabranom meniju. Točnu ponudu šaljemo nakon upita.
+    </p>
+    <div class="mt-14 grid gap-4 lg:grid-cols-12" data-reveal-grupa>
+      {
+        paketi.map((p, i) => (
+          <article
+            class:list={[
+              'flex flex-col p-7 md:p-9',
+              p.data.istaknuto ? 'na-tamnom bg-bordo-900 text-krem lg:col-span-5' : i === 0 ? 'bg-pozadina lg:col-span-4' : 'bg-pozadina lg:col-span-3',
+            ]}
+            data-reveal
+          >
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h3 class="font-display text-2xl md:text-3xl">{p.data.naziv}</h3>
+              <DemoOznaka potvrdeno={p.data.potvrdeno} tekst="Primjer cijene" />
+            </div>
+            <p class="mt-6">
+              {p.data.cijenaOd !== null ? (
+                <>
+                  <span class:list={['text-sm', p.data.istaknuto ? 'text-krem/75' : 'text-tekst-meki']}>od </span>
+                  <span class="font-display text-5xl tabular-nums">{eur.format(p.data.cijenaOd)}</span>
+                  <span class:list={['ml-1 text-sm', p.data.istaknuto ? 'text-krem/75' : 'text-tekst-meki']}>{p.data.jedinica}</span>
+                </>
+              ) : (
+                <span class="font-display text-2xl">Cijena {p.data.jedinica}</span>
+              )}
+            </p>
+            <ul class:list={['mt-8 space-y-3 border-t pt-6', p.data.istaknuto ? 'border-krem/20' : 'border-rub/15']}>
+              {p.data.stavke.map((s) => (
+                <li class="flex gap-3">
+                  <Ikona ime="check" velicina={20} class={p.data.istaknuto ? 'mt-0.5 shrink-0 text-zlato' : 'mt-0.5 shrink-0 text-naglasak'} />
+                  <span class={p.data.istaknuto ? 'text-krem/90' : 'text-tekst-meki'}>{s}</span>
+                </li>
+              ))}
+            </ul>
+            <div class="mt-auto pt-10">
+              <a href="#upit" class:list={['w-full', p.data.istaknuto ? 'gumb-svijetli' : 'gumb-obrub text-naglasak']}>
+                Zatražite ponudu
+              </a>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

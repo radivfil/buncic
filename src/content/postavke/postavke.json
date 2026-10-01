@@ -1,0 +1,49 @@
+[
+  {
+    "id": "opce",
+    "naziv": "Obitelj Bunčić",
+    "slogan": "Obiteljsko imanje na Martin bregu, od 1994.",
+    "email": "info@buncic.hr",
+    "telefon": "+385 1 2781-133",
+    "mobitel": "+385 91 4450-654",
+    "adresa": "Šaškovečka 182, 10370 Dugo Selo",
+    "kartaUrl": "https://www.google.com/maps/search/?api=1&query=Klet+Bun%C4%8Di%C4%87+%C5%A0a%C5%A1kove%C4%8Dka+182+Dugo+Selo",
+    "facebook": "",
+    "instagram": "",
+    "tvrtka": {
+      "naziv": "Ugostiteljski obrt Konoba Barba",
+      "vlasnica": "Nevenka Bunčić",
+      "oib": "84036880370",
+      "pdv": "HR84036880370",
+      "iban": "HR7523600001101452644"
+    },
+    "lokacije": [
+      {
+        "naziv": "Klet obitelji Bunčić",
+        "adresa": "Šaškovečka 182, Dugo Selo",
+        "koordinate": [45.8186525, 16.2393532],
+        "telefoni": ["+385 1 2781-133", "+385 1 2781-132", "+385 91 4450-654"],
+        "radnoVrijeme": [
+          "Nedjelja - četvrtak: 7 - 23 h",
+          "Petak i subota: 7 - 4 h",
+          "Tijekom svadbenih svečanosti: 7 - 6 h",
+          "Recepcija (sobe): 0 - 24 h"
+        ]
+      },
+      {
+        "naziv": "Ribarska koliba",
+        "adresa": "Rugvička ulica 217, Dugo Selo",
+        "koordinate": [45.7850724, 16.2364074],
+        "telefoni": ["+385 1 2753-393", "+385 91 4450-659"],
+        "radnoVrijeme": ["Ponedjeljak - subota: 7 - 22 h", "Nedjelja: 7 - 21 h"]
+      },
+      {
+        "naziv": "Uprava i računovodstvo",
+        "adresa": "Josipa Zorića 59, 10370 Dugo Selo",
+        "telefoni": ["+385 1 2754-938"],
+        "email": "racunovodstvo@buncic.hr",
+        "radnoVrijeme": []
+      }
+    ]
+  }
+]

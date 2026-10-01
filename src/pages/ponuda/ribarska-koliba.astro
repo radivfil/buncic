@@ -1,0 +1,131 @@
+---
+import { Picture } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+import Osnovni from '../../layouts/Osnovni.astro';
+import Ikona from '../../components/Ikona.astro';
+import Galerija from '../../components/Galerija.astro';
+import Karta from '../../components/Karta.astro';
+import DemoOznaka from '../../components/DemoOznaka.astro';
+import SekcijaUpit from '../../components/SekcijaUpit.astro';
+// ZAMIJENITI PRIJE LAUNCHA: arhivska fotografija, 960 px
+import raznjic from '../../assets/images/koliba/raznjic-vatra.jpg';
+
+const unos = (await getEntry('ponuda', 'ribarska-koliba'))!;
+const { Content } = await render(unos);
+const d = unos.data;
+const postavke = (await getEntry('postavke', 'opce'))!.data;
+const koliba = postavke.lokacije.find((l) => l.naziv === 'Ribarska koliba')!;
+const tel = (b: string) => `tel:${b.replace(/[^\d+]/g, '')}`;
+
+// Izdvojena jela sa stare stranice (buncic.hr, 2015.)
+const jela = [
+  { naziv: 'Mlada jaretina s ražnja', opis: 'Peče se polagano na otvorenoj vatri.' },
+  { naziv: 'Fiš paprikaš', opis: 'Od slatkovodne ribe, po domaćem receptu.' },
+  { naziv: 'Plata „Jezero”', opis: 'Kućni specijalitet Ribarske kolibe.' },
+];
+const shema = {
+  '@context': 'https://schema.org',
+  '@type': 'Restaurant',
+  name: 'Ribarska koliba Bunčić',
+  servesCuisine: ['Riba', 'Jela s ražnja', 'Domaća kuhinja'],
+  telephone: '+38512753393',
+  address: { '@type': 'PostalAddress', streetAddress: 'Rugvička ulica 217', postalCode: '10370', addressLocality: 'Dugo Selo', addressCountry: 'HR' },
+  geo: { '@type': 'GeoCoordinates', latitude: koliba.koordinate?.[0], longitude: koliba.koordinate?.[1] },
+};
+---
+
+<Osnovni naslov={d.seoNaslov} opis={d.seoOpis} slika={d.naslovnica} zaglavljePreko shema={shema}>
+  <!-- HERO: jezero i terasa -->
+  <section class="relative isolate flex min-h-[80dvh] items-end overflow-hidden bg-podrum text-krem">
+    <div class="absolute inset-0 -z-10" data-hero-slika>
+      <Picture src={d.naslovnica!} alt={d.naslovnicaAlt!} formats={['avif', 'webp']} widths={[640, 960]} sizes="100vw" loading="eager" fetchpriority="high" class="h-full w-full object-cover" />
+    </div>
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-podrum/90 via-podrum/40 to-podrum/25"></div>
+    <div class="okvir pb-16 pt-32 lg:pb-24" data-hero>
+      <h1 class="text-6xl leading-[1.02] tracking-tight md:text-7xl lg:text-8xl">Ribarska koliba</h1>
+      <p class="mt-6 max-w-[44ch] text-lg leading-relaxed text-krem/90 md:text-xl">{d.uvod}</p>
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a href={tel(koliba.telefoni[0])} class="gumb-svijetli"><Ikona ime="phone" velicina={18} /> Rezervirajte stol</a>
+        <a href="#lokacija" class="gumb-obrub-svijetli"><Ikona ime="map-trifold" velicina={18} /> Kako do nas</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- UVOD i kratke činjenice -->
+  <section class="okvir grid gap-12 py-24 lg:grid-cols-12 lg:py-32">
+    <div class="lg:col-span-6" data-reveal-grupa>
+      <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Utočište od gradske vreve, na samoj vodi</h2>
+      <div class="proza mt-8 max-w-[58ch] text-lg leading-relaxed text-tekst-meki" data-reveal><Content /></div>
+    </div>
+    <dl class="grid grid-cols-2 gap-x-8 gap-y-10 self-center border-t border-rub/15 pt-10 lg:col-span-5 lg:col-start-8" data-reveal>
+      <div>
+        <dt class="flex items-center gap-2 text-sm text-tekst-meki"><Ikona ime="sailboat" velicina={18} class="text-naglasak" /> Uz jezero</dt>
+        <dd class="mt-2 font-display text-2xl">Velika terasa</dd>
+      </div>
+      <div>
+        <dt class="flex items-center gap-2 text-sm text-tekst-meki"><Ikona ime="fish" velicina={18} class="text-naglasak" /> Ribolov</dt>
+        <dd class="mt-2 font-display text-2xl">Na jezeru</dd>
+      </div>
+      <div>
+        <dt class="flex items-center gap-2 text-sm text-tekst-meki"><Ikona ime="baby-carriage" velicina={18} class="text-naglasak" /> Za djecu</dt>
+        <dd class="mt-2 font-display text-2xl">Ograđeno igralište</dd>
+      </div>
+      <div>
+        <dt class="flex items-center gap-2 text-sm text-tekst-meki"><Ikona ime="users" velicina={18} class="text-naglasak" /> Svečanosti</dt>
+        <dd class="mt-2 font-display text-2xl tabular-nums">do 80 osoba</dd>
+        <dd class="mt-2"><DemoOznaka tekst="Potvrditi kapacitet" /></dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- KUHINJA: fotografija ražnja i jelovnik, tamna traka -->
+  <section class="na-tamnom bg-podrum text-krem">
+    <div class="grid lg:grid-cols-2">
+      <div class="relative min-h-[360px]" data-reveal="fade">
+        <Picture src={raznjic} alt="Meso se peče na ražnju iznad otvorene vatre" formats={['avif', 'webp']} widths={[640, 960]} sizes="(min-width: 1024px) 50vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
+      </div>
+      <div class="px-4 py-20 sm:px-6 lg:px-16 lg:py-28" data-reveal-grupa>
+        <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Riba, ražanj i gableci</h2>
+        <p class="mt-6 max-w-[46ch] text-lg leading-relaxed text-krem/80" data-reveal>
+          Specijaliteti domaće kuhinje, jela od slatkovodne ribe, jela s ražnja i gableci.
+        </p>
+        <ul class="mt-10 max-w-lg" data-reveal>
+          {
+            jela.map((j) => (
+              <li class="border-t border-krem/15 py-6">
+                <h3 class="font-display text-2xl md:text-3xl">{j.naziv}</h3>
+                <p class="mt-2 text-krem/75">{j.opis}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <DemoOznaka tekst="Jelovnik iz 2015., potvrditi" class="text-krem" />
+      </div>
+    </div>
+  </section>
+
+  <section class="okvir py-24 lg:py-32" aria-labelledby="koliba-galerija">
+    <h2 id="koliba-galerija" class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Terasa uz jezero</h2>
+    <div class="mt-12">
+      <Galerija slike={d.galerija} id="galerija-koliba" />
+    </div>
+  </section>
+
+  <!-- LOKACIJA -->
+  <section id="lokacija" class="scroll-mt-24 bg-pozadina-2/60 py-24 lg:py-32" aria-label="Lokacija i radno vrijeme">
+    <div class="okvir">
+      <Karta
+        naziv="Ribarska koliba"
+        adresa={koliba.adresa}
+        koordinate={koliba.koordinate!}
+        upute={[...koliba.radnoVrijeme, `Telefon: ${koliba.telefoni.join(', ')}`]}
+      />
+    </div>
+  </section>
+
+  <SekcijaUpit
+    naslov="Najavite se ili rezervirajte slavlje"
+    opis="Za veća društva, obiteljska okupljanja i manja vjenčanja uz jezero pošaljite nam poruku."
+    vrsta="opci"
+  />
+</Osnovni>

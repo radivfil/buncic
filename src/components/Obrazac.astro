@@ -1,0 +1,279 @@
+---
+/*
+  Tri zasebna obrasca za upite:
+  - "dogadjaj"  vjenčanja i proslave (ime, kontakt, datum, broj gostiju, lokacija, napomena)
+  - "smjestaj"  dolazak, odlazak, broj osoba, broj soba
+  - "opci"      ime, kontakt, poruka
+  DEMO: slanje se simulira. Za produkciju postaviti action na Cloudflare Pages
+  Function (npr. functions/api/upit.ts) ili servis poput Formspree / Web3Forms.
+*/
+import Ikona from './Ikona.astro';
+
+interface Props {
+  vrsta: 'dogadjaj' | 'smjestaj' | 'opci';
+  id?: string;
+  /** Unaprijed odabrana vrsta događaja (npr. "Krštenje" na stranici Proslave) */
+  prigoda?: string;
+  tamno?: boolean;
+}
+
+const { vrsta, id = `obrazac-${vrsta}`, prigoda, tamno = false } = Astro.props;
+const prigode = ['Vjenčanje', 'Krštenje', 'Pričest ili krizma', 'Rođendan', 'Domjenak ili poslovni događaj', 'Catering na vašoj lokaciji', 'Drugo'];
+const lokacije = ['Klet obitelji Bunčić, Šaškovečka 182', 'Ribarska koliba, Rugvička 217', 'Catering na mojoj lokaciji', 'Još ne znam'];
+const f = (ime: string) => `${id}-${ime}`;
+---
+
+<form
+  id={id}
+  class:list={['obrazac relative', tamno && 'obrazac-tamno']}
+  data-obrazac={vrsta}
+  novalidate
+  action="/api/upit"
+  method="post"
+>
+  <input type="hidden" name="vrsta-upita" value={vrsta} />
+  <div class="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2">
+    <div class="polje">
+      <label for={f('ime')}>Ime i prezime</label>
+      <input id={f('ime')} name="ime" type="text" autocomplete="name" required aria-describedby={f('ime-greska')} />
+      <p class="greska" id={f('ime-greska')}>Upišite ime i prezime.</p>
+    </div>
+
+    <div class="polje">
+      <label for={f('kontakt')}>E-mail ili telefon</label>
+      <input
+        id={f('kontakt')}
+        name="kontakt"
+        type="text"
+        autocomplete="email"
+        inputmode="email"
+        spellcheck="false"
+        required
+        data-provjera="kontakt"
+        aria-describedby={`${f('kontakt-pomoc')} ${f('kontakt-greska')}`}
+      />
+      <p class="pomoc" id={f('kontakt-pomoc')}>Javit ćemo se unutar jednog radnog dana.</p>
+      <p class="greska" id={f('kontakt-greska')}>Upišite ispravan e-mail ili broj telefona.</p>
+    </div>
+
+    {
+      vrsta === 'dogadjaj' && (
+        <>
+          <div class="polje">
+            <label for={f('prigoda')}>Prigoda</label>
+            <select id={f('prigoda')} name="prigoda">
+              {prigode.map((p) => (
+                <option selected={p === prigoda}>{p}</option>
+              ))}
+            </select>
+          </div>
+          <div class="polje">
+            <label for={f('datum')}>Željeni datum</label>
+            <input id={f('datum')} name="datum" type="date" required data-provjera="buduci" aria-describedby={f('datum-greska')} />
+            <p class="greska" id={f('datum-greska')}>Odaberite datum u budućnosti.</p>
+          </div>
+          <div class="polje">
+            <label for={f('gosti')}>Broj gostiju</label>
+            <input id={f('gosti')} name="gosti" type="number" min="1" max="1000" inputmode="numeric" required aria-describedby={f('gosti-greska')} />
+            <p class="greska" id={f('gosti-greska')}>Upišite okviran broj gostiju.</p>
+          </div>
+          <div class="polje">
+            <label for={f('lokacija')}>Lokacija</label>
+            <select id={f('lokacija')} name="lokacija">
+              {lokacije.map((l) => (
+                <option>{l}</option>
+              ))}
+            </select>
+          </div>
+          <div class="polje md:col-span-2">
+            <label for={f('napomena')}>Napomena <span class="font-normal text-tekst-meki">(neobavezno)</span></label>
+            <textarea id={f('napomena')} name="napomena" rows="4" aria-describedby={f('napomena-pomoc')} />
+            <p class="pomoc" id={f('napomena-pomoc')}>Npr. obred na otvorenom, posebni jelovnici, smještaj za goste.</p>
+          </div>
+        </>
+      )
+    }
+
+    {
+      vrsta === 'smjestaj' && (
+        <>
+          <div class="polje">
+            <label for={f('dolazak')}>Datum dolaska</label>
+            <input id={f('dolazak')} name="dolazak" type="date" required data-provjera="buduci" aria-describedby={f('dolazak-greska')} />
+            <p class="greska" id={f('dolazak-greska')}>Odaberite datum dolaska.</p>
+          </div>
+          <div class="polje">
+            <label for={f('odlazak')}>Datum odlaska</label>
+            <input id={f('odlazak')} name="odlazak" type="date" required data-provjera="nakon-dolaska" aria-describedby={f('odlazak-greska')} />
+            <p class="greska" id={f('odlazak-greska')}>Odlazak mora biti nakon dolaska.</p>
+          </div>
+          <div class="polje">
+            <label for={f('osobe')}>Broj osoba</label>
+            <input id={f('osobe')} name="osobe" type="number" min="1" max="120" inputmode="numeric" required aria-describedby={f('osobe-greska')} />
+            <p class="greska" id={f('osobe-greska')}>Upišite broj osoba.</p>
+          </div>
+          <div class="polje">
+            <label for={f('sobe')}>Broj soba</label>
+            <input id={f('sobe')} name="sobe" type="number" min="1" max="40" inputmode="numeric" required aria-describedby={f('sobe-greska')} />
+            <p class="greska" id={f('sobe-greska')}>Upišite broj soba (1 do 40).</p>
+          </div>
+        </>
+      )
+    }
+
+    {
+      vrsta === 'opci' && (
+        <div class="polje md:col-span-2">
+          <label for={f('poruka')}>Poruka</label>
+          <textarea id={f('poruka')} name="poruka" rows="5" required aria-describedby={f('poruka-greska')} />
+          <p class="greska" id={f('poruka-greska')}>Napišite kratku poruku.</p>
+        </div>
+      )
+    }
+
+    <div class="polje md:col-span-2">
+      <label class="flex items-start gap-3 font-normal">
+        <input type="checkbox" name="privola" required class="mt-0.5 h-6 w-6 min-h-0 shrink-0 accent-naglasak" aria-describedby={f('privola-greska')} />
+        <span class="text-sm">Pristajem da se moji podaci koriste isključivo za odgovor na ovaj upit. <a href="/pravila-privatnosti" class="underline underline-offset-4">Pravila privatnosti</a></span>
+      </label>
+      <p class="greska" id={f('privola-greska')}>Potrebna je vaša privola.</p>
+    </div>
+  </div>
+
+  <div class="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+    <button type="submit" class:list={[tamno ? 'gumb-svijetli' : 'gumb-primarni', 'min-w-48']} data-posalji>
+      <span data-tekst>Pošaljite upit</span>
+      <Ikona ime="paper-plane-right" velicina={18} />
+    </button>
+    <p class="text-sm opacity-80" role="status" aria-live="polite" data-status></p>
+  </div>
+
+  <div class="uspjeh absolute inset-0 hidden flex-col items-start justify-center gap-4 p-2" data-uspjeh tabindex="-1">
+    <Ikona ime="check-circle" velicina={44} class="text-naglasak" />
+    <p class="font-display text-3xl">Hvala, upit je zaprimljen.</p>
+    <p class="max-w-[48ch] opacity-85">Javit ćemo vam se unutar jednog radnog dana. Za hitne upite nazovite 01 2781-133.</p>
+    <button type="button" class="poveznica mt-2" data-novi-upit>Pošaljite novi upit</button>
+  </div>
+</form>
+
+<style>
+  .obrazac[data-poslano] > :not([data-uspjeh]) {
+    visibility: hidden;
+  }
+  .obrazac[data-poslano] [data-uspjeh] {
+    display: flex;
+  }
+  /* Tamna varijanta (gastro stranice): kontrast polja na tamnoj podlozi */
+  .obrazac-tamno {
+    color-scheme: dark;
+  }
+  .obrazac-tamno :global(.polje label) {
+    color: var(--color-krem);
+  }
+  .obrazac-tamno :global(.polje input:not([type='checkbox'])),
+  .obrazac-tamno :global(.polje select),
+  .obrazac-tamno :global(.polje textarea) {
+    background: rgb(255 255 255 / 0.06);
+    border-color: rgb(244 238 227 / 0.35);
+    color: var(--color-krem);
+  }
+  .obrazac-tamno :global(.polje select option) {
+    background: var(--color-podrum-800);
+    color: var(--color-krem);
+  }
+  .obrazac-tamno :global(.polje input:focus),
+  .obrazac-tamno :global(.polje select:focus),
+  .obrazac-tamno :global(.polje textarea:focus) {
+    border-color: var(--color-zlato);
+    background: rgb(255 255 255 / 0.1);
+  }
+  .obrazac-tamno :global(.polje .pomoc) {
+    color: rgb(244 238 227 / 0.75);
+  }
+  .obrazac-tamno :global(.polje .greska) {
+    color: #f3a58f;
+  }
+  .obrazac-tamno :global(.polje[data-neispravno] input),
+  .obrazac-tamno :global(.polje[data-neispravno] textarea) {
+    border-color: #f3a58f;
+  }
+  .obrazac-tamno :global(.uspjeh svg) {
+    color: var(--color-zlato);
+  }
+</style>
+
+<script>
+  import { animate } from 'motion';
+
+  const smanjeno = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const danas = new Date().toISOString().slice(0, 10);
+
+  document.querySelectorAll<HTMLFormElement>('form[data-obrazac]').forEach((forma) => {
+    forma.querySelectorAll<HTMLInputElement>('input[type="date"]').forEach((d) => (d.min = danas));
+
+    const provjeri = (polje: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => {
+      let ok = polje.checkValidity();
+      const v = polje.value.trim();
+      const tip = polje.dataset.provjera;
+      if (ok && tip === 'kontakt') {
+        ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || /^\+?[\d\s/-]{6,}$/.test(v);
+      }
+      if (ok && tip === 'buduci') ok = v >= danas;
+      if (ok && tip === 'nakon-dolaska') {
+        const dolazak = forma.querySelector<HTMLInputElement>('[name="dolazak"]')?.value;
+        ok = !dolazak || v > dolazak;
+      }
+      if (ok && polje.type !== 'checkbox' && polje.required && !v) ok = false;
+      const omot = polje.closest('.polje');
+      omot?.toggleAttribute('data-neispravno', !ok);
+      polje.setAttribute('aria-invalid', String(!ok));
+      return ok;
+    };
+
+    const polja = () => [...forma.querySelectorAll<HTMLInputElement>('input:not([type="hidden"]), textarea, select')];
+    polja().forEach((p) => {
+      p.addEventListener('blur', () => {
+        if (p.type !== 'checkbox' && (p.value || p.closest('[data-neispravno]'))) provjeri(p);
+      });
+      // Greška nestaje čim polje postane ispravno (dok se tipka), a ne tek na blur,
+      // da se raspored ne pomakne ispod kursora u trenutku klika na sljedeće polje.
+      const dogadjaj = p.type === 'checkbox' || p.tagName === 'SELECT' || p.type === 'date' ? 'change' : 'input';
+      p.addEventListener(dogadjaj, () => {
+        if (p.closest('[data-neispravno]')) provjeri(p);
+      });
+    });
+
+    forma.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const neispravna = polja().filter((p) => !provjeri(p));
+      if (neispravna.length) {
+        neispravna[0].focus();
+        return;
+      }
+      const gumb = forma.querySelector<HTMLButtonElement>('[data-posalji]')!;
+      const tekst = gumb.querySelector('[data-tekst]')!;
+      const status = forma.querySelector('[data-status]')!;
+      gumb.disabled = true;
+      gumb.setAttribute('aria-busy', 'true');
+      tekst.textContent = 'Šaljem…';
+      status.textContent = '';
+
+      // DEMO: simulacija slanja. U produkciji: await fetch(forma.action, { method: 'POST', body: new FormData(forma) })
+      await new Promise((r) => setTimeout(r, 900));
+
+      gumb.disabled = false;
+      gumb.removeAttribute('aria-busy');
+      tekst.textContent = 'Pošaljite upit';
+      forma.toggleAttribute('data-poslano', true);
+      const uspjeh = forma.querySelector<HTMLElement>('[data-uspjeh]')!;
+      uspjeh.focus();
+      if (!smanjeno) animate(uspjeh.children, { opacity: [0, 1], y: [12, 0] }, { duration: 0.5 });
+    });
+
+    forma.querySelector('[data-novi-upit]')?.addEventListener('click', () => {
+      forma.reset();
+      forma.removeAttribute('data-poslano');
+      polja()[0]?.focus();
+    });
+  });
+</script>

@@ -1,0 +1,40 @@
+---
+/*
+  Fotografija preko cijele širine s tekstom preko nje.
+  Razbija ritam "tekst lijevo / slika desno" između sekcija.
+  poravnanje: gdje stoji tekst ('lijevo' | 'desno' | 'sredina')
+*/
+import { Picture } from 'astro:assets';
+
+interface Props {
+  slika: ImageMetadata;
+  alt: string;
+  poravnanje?: 'lijevo' | 'desno' | 'sredina';
+  visina?: string;
+  pozicija?: string;
+}
+
+const { slika, alt, poravnanje = 'lijevo', visina = 'min-h-[70dvh]', pozicija = 'object-center' } = Astro.props;
+const omot = {
+  lijevo: 'items-end justify-start text-left',
+  desno: 'items-end justify-end text-left',
+  sredina: 'items-center justify-center text-center',
+}[poravnanje];
+const gradijent = {
+  lijevo: 'bg-gradient-to-r from-podrum/90 via-podrum/65 to-podrum/10 max-md:bg-podrum/70',
+  desno: 'bg-gradient-to-l from-podrum/90 via-podrum/65 to-podrum/10 max-md:bg-podrum/70',
+  sredina: 'bg-podrum/60',
+}[poravnanje];
+---
+
+<section class="na-tamnom relative isolate overflow-hidden bg-podrum text-krem">
+  <div class="absolute inset-0 -z-10" data-reveal="fade">
+    <Picture src={slika} alt={alt} formats={['avif', 'webp']} widths={[640, 1200, 1800, 2400]} sizes="100vw" class:list={['h-full w-full object-cover', pozicija]} />
+  </div>
+  <div class:list={['absolute inset-0 -z-10', gradijent]}></div>
+  <div class:list={['okvir flex py-20 lg:py-28', visina, omot]}>
+    <div class:list={['max-w-xl', poravnanje === 'sredina' && 'mx-auto max-w-3xl']} data-reveal>
+      <slot />
+    </div>
+  </div>
+</section>

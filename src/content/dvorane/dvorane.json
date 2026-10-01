@@ -1,0 +1,66 @@
+[
+  {
+    "id": "podrum",
+    "naziv": "Podrum sa svodovima",
+    "opis": "Svodovi od opeke i topla rasvjeta. Za manja vjenčanja i obiteljska slavlja.",
+    "min": 40,
+    "max": 120,
+    "konfiguracije": [
+      { "tip": "Okrugli stolovi", "gosti": 100 },
+      { "tip": "Dugi stolovi", "gosti": 120 }
+    ],
+    "slika": "../../assets/images/restoran/podrum-svodovi.jpg",
+    "alt": "Podrum sa svodovima od opeke i svečano postavljenim stolovima",
+    "redoslijed": 1,
+    "potvrdeno": false,
+    "napomena": "[UNIJETI STVARNI SADRŽAJ] naziv dvorane i kapaciteti su primjer; potvrditi s klijentom"
+  },
+  {
+    "id": "grede",
+    "naziv": "Dvorana s drvenim gredama",
+    "opis": "Drveni stropovi i stupovi, pogled na zelenilo. Srednja vjenčanja i svečani ručkovi.",
+    "min": 100,
+    "max": 250,
+    "konfiguracije": [
+      { "tip": "Okrugli stolovi", "gosti": 220 },
+      { "tip": "Dugi stolovi", "gosti": 250 }
+    ],
+    "slika": "../../assets/images/dvorane/grede-svjetla.jpg",
+    "alt": "Dvorana s drvenim gredama, okruglim stolovima i bijelim presvlakama stolica",
+    "redoslijed": 2,
+    "potvrdeno": false,
+    "napomena": "[UNIJETI STVARNI SADRŽAJ] naziv dvorane i kapaciteti su primjer; potvrditi s klijentom"
+  },
+  {
+    "id": "velika",
+    "naziv": "Velika dvorana",
+    "opis": "Najveći prostor na imanju, s plesnim podijem i pozornicom za bend.",
+    "min": 200,
+    "max": 450,
+    "konfiguracije": [
+      { "tip": "Okrugli stolovi", "gosti": 400 },
+      { "tip": "Dugi stolovi", "gosti": 450 }
+    ],
+    "slika": "../../assets/images/dvorane/velika-dvorana.jpg",
+    "alt": "Velika dvorana s glavnim stolom mladenaca i okruglim stolovima",
+    "redoslijed": 3,
+    "potvrdeno": false,
+    "napomena": "[UNIJETI STVARNI SADRŽAJ] naziv dvorane i kapaciteti su primjer; potvrditi s klijentom"
+  },
+  {
+    "id": "koliba",
+    "naziv": "Ribarska koliba na jezeru",
+    "opis": "Zasebna lokacija uz jezero, s velikom terasom. Za intimnija vjenčanja.",
+    "min": 30,
+    "max": 80,
+    "konfiguracije": [
+      { "tip": "Unutra", "gosti": 80 },
+      { "tip": "Terasa uz jezero", "gosti": 80 }
+    ],
+    "slika": "../../assets/images/koliba/jezero-vrbe.jpg",
+    "alt": "Terasa Ribarske kolibe uz jezero okruženo vrbama",
+    "redoslijed": 4,
+    "potvrdeno": false,
+    "napomena": "Stara stranica (2015.) navodi svečanosti do 80 osoba; potvrditi aktualni kapacitet i podjelu unutra / terasa"
+  }
+]

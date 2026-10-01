@@ -1,0 +1,101 @@
+---
+import { getCollection } from 'astro:content';
+import Osnovni from '../../layouts/Osnovni.astro';
+import KarticaNovosti from '../../components/KarticaNovosti.astro';
+
+const objave = (await getCollection('novosti')).sort((a, b) => +b.data.datum - +a.data.datum);
+const istaknuta = objave.find((o) => o.data.istaknuto) ?? objave[0];
+const ostale = objave.filter((o) => o.id !== istaknuta.id);
+const kategorije = [...new Set(objave.map((o) => o.data.kategorija))];
+---
+
+<Osnovni
+  naslov="Novosti i događanja | Obitelj Bunčić"
+  opis="Događanja, blagdanski programi, domjenci i novosti s imanja obitelji Bunčić u Dugom Selu."
+  slika={istaknuta.data.naslovnica}
+>
+  <section class="okvir pb-10 pt-16 lg:pt-24">
+    <div data-hero>
+      <h1 class="text-5xl leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">Novosti i događanja</h1>
+      <p class="mt-6 max-w-[50ch] text-lg leading-relaxed text-tekst-meki">
+        Blagdanski programi, domjenci, glazbene večeri i sve što se događa na imanju.
+      </p>
+    </div>
+  </section>
+
+  <section class="okvir pb-16" aria-label="Istaknuta objava">
+    <div class="grid gap-8 border-t border-rub/15 pt-10 lg:grid-cols-12" data-reveal>
+      <div class="lg:col-span-8">
+        <KarticaNovosti objava={istaknuta} velika />
+      </div>
+    </div>
+  </section>
+
+  <section class="okvir pb-24 lg:pb-32" aria-labelledby="sve-objave">
+    <div class="flex flex-wrap items-center justify-between gap-4 border-t border-rub/15 pt-10">
+      <h2 id="sve-objave" class="text-3xl md:text-4xl">Sve objave</h2>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Filtriraj po kategoriji" data-filteri>
+        <button type="button" class="filter" aria-pressed="true" data-filter="sve">Sve</button>
+        {kategorije.map((k) => <button type="button" class="filter" aria-pressed="false" data-filter={k}>{k}</button>)}
+      </div>
+    </div>
+    <ul class="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3" data-reveal-grupa data-popis>
+      {
+        ostale.map((o) => (
+          <li data-kategorija={o.data.kategorija} data-reveal>
+            <KarticaNovosti objava={o} />
+          </li>
+        ))
+      }
+    </ul>
+    <p class="mt-10 hidden text-lg text-tekst-meki" data-prazno>
+      U ovoj kategoriji trenutno nema objava. <button type="button" class="poveznica text-naglasak" data-filter="sve">Prikaži sve</button>
+    </p>
+  </section>
+</Osnovni>
+
+<style>
+  .filter {
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 1px solid color-mix(in srgb, var(--color-rub) 25%, transparent);
+    font-size: 0.9375rem;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .filter:hover {
+    border-color: var(--color-naglasak);
+  }
+  .filter[aria-pressed='true'] {
+    background: var(--color-naglasak);
+    border-color: var(--color-naglasak);
+    color: var(--color-pozadina);
+  }
+</style>
+
+<script>
+  import { animate } from 'motion';
+  const popis = document.querySelector<HTMLElement>('[data-popis]')!;
+  const prazno = document.querySelector<HTMLElement>('[data-prazno]')!;
+  const filteri = document.querySelectorAll<HTMLButtonElement>('[data-filteri] [data-filter]');
+  const primijeni = (f: string) => {
+    let vidljivo = 0;
+    popis.querySelectorAll<HTMLElement>('li[data-kategorija]').forEach((li) => {
+      const prikazi = f === 'sve' || li.dataset.kategorija === f;
+      li.hidden = !prikazi;
+      if (prikazi) {
+        vidljivo++;
+        li.style.opacity = '1';
+        li.style.transform = 'none';
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) animate(li, { opacity: [0, 1], y: [10, 0] }, { duration: 0.35 });
+      }
+    });
+    prazno.classList.toggle('hidden', vidljivo > 0);
+    filteri.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === f)));
+    const url = new URL(location.href);
+    f === 'sve' ? url.searchParams.delete('kategorija') : url.searchParams.set('kategorija', f);
+    history.replaceState(null, '', url);
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) => b.addEventListener('click', () => primijeni(b.dataset.filter!)));
+  const izUrla = new URLSearchParams(location.search).get('kategorija');
+  if (izUrla && [...filteri].some((b) => b.dataset.filter === izUrla)) primijeni(izUrla);
+</script>

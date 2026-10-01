@@ -1,0 +1,97 @@
+---
+import { Picture } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+import Osnovni from '../../layouts/Osnovni.astro';
+import Ikona from '../../components/Ikona.astro';
+import Galerija from '../../components/Galerija.astro';
+import SekcijaUpit from '../../components/SekcijaUpit.astro';
+import FotoTraka from '../../components/FotoTraka.astro';
+// ZAMIJENITI PRIJE LAUNCHA: arhivska fotografija (mobitel)
+import kuca from '../../assets/images/imanje/stara-drvena-kuca.jpg';
+
+const unos = (await getEntry('ponuda', 'proslave'))!;
+const { Content } = await render(unos);
+const d = unos.data;
+
+const prigode = [
+  { naziv: 'Krštenja', ikona: 'baby', opis: 'Obiteljski ručak nakon obreda, u mirnoj dvorani ili na terasi.' },
+  { naziv: 'Pričesti i krizme', ikona: 'church', opis: 'Svečani meniji za veća društva, s tortom po želji.' },
+  { naziv: 'Rođendani i obljetnice', ikona: 'cake', opis: 'Od okruglih rođendana do zlatnih pira.' },
+  { naziv: 'Domjenci i poslovni događaji', ikona: 'users-three', opis: 'Božićni domjenci, proslave tvrtki i poslovni ručkovi.' },
+];
+---
+
+<Osnovni naslov={d.seoNaslov} opis={d.seoOpis} slika={d.naslovnica}>
+  <!-- UVOD: naslov iznad, široka fotografija ispod -->
+  <section class="okvir pb-12 pt-16 lg:pt-24">
+    <div data-hero>
+      <h1 class="text-5xl leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">
+        Proslave i <em class="italic text-naglasak">svečanosti</em>
+      </h1>
+      <p class="mt-6 max-w-[56ch] text-lg leading-relaxed text-tekst-meki">{d.uvod}</p>
+      <a href="#upit" class="gumb-primarni mt-8">Pošaljite upit</a>
+    </div>
+  </section>
+  <div class="okvir" data-hero-slika>
+    <div class="aspect-[4/3] overflow-hidden sm:aspect-[21/9]">
+      <Picture
+        src={d.naslovnica!}
+        alt={d.naslovnicaAlt!}
+        formats={['avif', 'webp']}
+        widths={[640, 1000, 1500]}
+        sizes="(min-width: 1320px) 1240px, 100vw"
+        loading="eager"
+        fetchpriority="high"
+        class="h-full w-full object-cover"
+      />
+    </div>
+  </div>
+
+  <!-- PRIGODE: popis u dva stupca s ikonama -->
+  <section class="okvir py-24 lg:py-32">
+    <h2 class="max-w-[20ch] text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Za svaku prigodu, prijedlog menija</h2>
+    <ul class="mt-14 grid gap-x-16 gap-y-12 md:grid-cols-2" data-reveal-grupa>
+      {
+        prigode.map((p) => (
+          <li class="flex gap-6" data-reveal>
+            <span class="flex h-16 w-16 shrink-0 items-center justify-center bg-pozadina-2 text-naglasak">
+              <Ikona ime={p.ikona} velicina={32} />
+            </span>
+            <div>
+              <h3 class="font-display text-2xl md:text-3xl">{p.naziv}</h3>
+              <p class="mt-2 max-w-[40ch] leading-relaxed text-tekst-meki">{p.opis}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- VINSKI BLAGDANI: fotografija preko cijele širine (stara drvena kuća na imanju) -->
+  <FotoTraka slika={kuca} alt="Stara drvena kuća od greda na imanju" poravnanje="lijevo" pozicija="object-[60%_50%]">
+    <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl">
+      Berba, Vincekovo, Martinje. <em class="italic text-zlato">Slavimo i mi.</em>
+    </h2>
+    <div class="proza mt-6 text-lg leading-relaxed text-krem/85">
+      <Content />
+      <p>Dođite i proveselite se s nama.</p>
+    </div>
+  </FotoTraka>
+
+  <section class="okvir py-24 lg:py-32" aria-labelledby="dvorane-naslov">
+    <h2 id="dvorane-naslov" class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Naše dvorane</h2>
+    <p class="mt-5 max-w-[52ch] text-lg leading-relaxed text-tekst-meki" data-reveal>
+      Nekoliko dvorana različitih veličina, pa i manja obiteljska proslava i veliko slavlje dobiju prostor po mjeri.
+    </p>
+    <div class="mt-12">
+      <Galerija slike={d.galerija} id="galerija-proslave" />
+    </div>
+  </section>
+
+  <SekcijaUpit
+    naslov="Recite nam što slavite"
+    opis="Pošaljite datum i broj gostiju, a mi ćemo predložiti dvoranu i svečani meni."
+    vrsta="dogadjaj"
+    prigoda="Krštenje"
+  />
+</Osnovni>

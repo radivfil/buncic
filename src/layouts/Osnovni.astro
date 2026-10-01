@@ -1,0 +1,96 @@
+---
+import '../styles/global.css';
+import Zaglavlje from '../components/Zaglavlje.astro';
+import Podnozje from '../components/Podnozje.astro';
+import Kolacici from '../components/Kolacici.astro';
+import Chatbot from '../components/Chatbot.astro';
+import Analitika from '../components/Analitika.astro';
+import { getImage } from 'astro:assets';
+import zadanaSlika from '../assets/images/pocetna/hero-mladenci-sjenica.jpg';
+import displayUrl from '@fontsource-variable/brygada-1918/files/brygada-1918-latin-wght-normal.woff2?url';
+// latin-ext nosi č, ć, š, ž, đ, koji su u gotovo svakom naslovu
+import displayExtUrl from '@fontsource-variable/brygada-1918/files/brygada-1918-latin-ext-wght-normal.woff2?url';
+import workSansUrl from '@fontsource-variable/work-sans/files/work-sans-latin-wght-normal.woff2?url';
+
+interface Props {
+  naslov: string;
+  opis: string;
+  slika?: ImageMetadata;
+  /** Zaglavlje preko hero fotografije */
+  zaglavljePreko?: boolean;
+  /** "podrum" = tamna tema za gastro stranice (catering, restoran) */
+  tema?: 'svijetla' | 'podrum';
+  shema?: Record<string, unknown> | Record<string, unknown>[];
+  tipStranice?: 'website' | 'article';
+}
+
+const {
+  naslov,
+  opis,
+  slika = zadanaSlika,
+  zaglavljePreko = false,
+  tema = 'svijetla',
+  shema,
+  tipStranice = 'website',
+} = Astro.props;
+
+const kanonski = new URL(Astro.url.pathname, Astro.site);
+const ogSlika = await getImage({ src: slika, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+const ogUrl = new URL(ogSlika.src, Astro.site);
+---
+
+<!doctype html>
+<html lang="hr" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Tema se postavlja prije prvog rendera (bez bljeska krive teme) -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        var t = null;
+        try { t = localStorage.getItem('buncic-tema'); } catch (e) {}
+        if (t !== 'tamna' && t !== 'svijetla') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'tamna' : 'svijetla';
+        d.dataset.tema = t;
+        try { if (localStorage.getItem('buncic-privola')) d.setAttribute('data-privola', ''); } catch (e) {}
+      })();
+    </script>
+    <title>{naslov}</title>
+    <meta name="description" content={opis} />
+    <link rel="canonical" href={kanonski} />
+    <link rel="preload" href={displayUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={displayExtUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={workSansUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content={tema === 'podrum' ? '#1d1411' : '#f4eee3'} data-podrum={tema === 'podrum' ? '' : undefined} />
+
+    <meta property="og:type" content={tipStranice} />
+    <meta property="og:locale" content="hr_HR" />
+    <meta property="og:site_name" content="Obitelj Bunčić" />
+    <meta property="og:title" content={naslov} />
+    <meta property="og:description" content={opis} />
+    <meta property="og:url" content={kanonski} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <Analitika />
+    {shema && <script type="application/ld+json" set:html={JSON.stringify(shema)} />}
+    <slot name="head" />
+  </head>
+  <body class:list={['zrno min-h-dvh', tema === 'podrum' && 'tema-podrum bg-podrum text-krem']}>
+    <Zaglavlje preko={zaglavljePreko} tema={tema} />
+    <main id="sadrzaj" tabindex="-1" class:list={['outline-none', !zaglavljePreko && 'pt-[72px] lg:pt-20']}>
+      <slot />
+    </main>
+    <Podnozje />
+    <Chatbot />
+    <Kolacici />
+    <script>
+      import '../scripts/animacije.ts';
+    </script>
+  </body>
+</html>

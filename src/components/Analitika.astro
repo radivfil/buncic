@@ -1,0 +1,52 @@
+---
+/*
+  PLACEHOLDER za Google Analytics 4 i Google Search Console.
+  1. Upiši GA4 Measurement ID u .env kao PUBLIC_GA_ID=G-XXXXXXXXXX
+  2. Upiši verifikacijski kod iz Search Consolea kao PUBLIC_GSC_VERIFIKACIJA=...
+  GA se učitava tek nakon što posjetitelj prihvati analitičke kolačiće
+  (Consent Mode v2: zadano je sve "denied").
+*/
+const gaId = import.meta.env.PUBLIC_GA_ID ?? '';
+const gsc = import.meta.env.PUBLIC_GSC_VERIFIKACIJA ?? '';
+---
+
+{gsc && <meta name="google-site-verification" content={gsc} />}
+
+<script is:inline define:vars={{ gaId }}>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied',
+  });
+
+  function primijeni(p) {
+    if (!p) return;
+    gtag('consent', 'update', {
+      analytics_storage: p.analitika ? 'granted' : 'denied',
+      ad_storage: p.marketing ? 'granted' : 'denied',
+      ad_user_data: p.marketing ? 'granted' : 'denied',
+      ad_personalization: p.marketing ? 'granted' : 'denied',
+    });
+    if (p.analitika && gaId && !window.__gaUcitan) {
+      window.__gaUcitan = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+      document.head.appendChild(s);
+      gtag('js', new Date());
+      gtag('config', gaId, { anonymize_ip: true });
+    }
+  }
+
+  try {
+    primijeni(JSON.parse(localStorage.getItem('buncic-privola') || 'null'));
+  } catch (e) {}
+  window.addEventListener('privola:promjena', function (e) {
+    primijeni(e.detail);
+  });
+</script>

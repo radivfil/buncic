@@ -1,0 +1,128 @@
+---
+/*
+  Privola za kolačiće. Tri gumba jednake vizualne težine (GDPR / EDPB smjernice).
+  Odluka se sprema u localStorage pod ključem "buncic-privola" i emitira
+  događaj "privola:promjena" koji sluša Analitika.astro.
+*/
+---
+
+<section
+  id="kolacici"
+  class="fixed inset-x-3 bottom-3 z-[45] border border-rub/15 bg-pozadina p-5 text-tekst shadow-[0_24px_60px_-20px_rgba(61,28,18,0.45)] sm:inset-x-auto sm:left-5 sm:bottom-5 sm:max-w-[440px] sm:p-6"
+  aria-labelledby="kolacici-naslov"
+  role="region"
+>
+  <h2 id="kolacici-naslov" class="font-display text-xl">Kolačići na ovoj stranici</h2>
+  <p class="mt-2 text-[0.9375rem] leading-relaxed text-tekst-meki">
+    Nužne kolačiće koristimo da bi stranica radila. Uz vaše dopuštenje koristimo i analitičke kolačiće kako bismo znali
+    što gosti najviše traže. <a href="/pravila-privatnosti" class="underline underline-offset-4">Više o tome</a>
+  </p>
+
+  <form id="kolacici-postavke" class="mt-4 space-y-3 border-t border-rub/10 pt-4" hidden>
+    <label class="flex items-start gap-3">
+      <input type="checkbox" checked disabled class="mt-1 h-4 w-4 accent-naglasak" />
+      <span class="text-sm"><strong class="font-medium">Nužni</strong><br /><span class="text-tekst-meki">Rad stranice i spremanje ove odluke. Uvijek uključeni.</span></span>
+    </label>
+    <label class="flex items-start gap-3">
+      <input type="checkbox" name="analitika" class="mt-1 h-4 w-4 accent-naglasak" />
+      <span class="text-sm"><strong class="font-medium">Analitički</strong><br /><span class="text-tekst-meki">Google Analytics, anonimna statistika posjeta.</span></span>
+    </label>
+    <label class="flex items-start gap-3">
+      <input type="checkbox" name="marketing" class="mt-1 h-4 w-4 accent-naglasak" />
+      <span class="text-sm"><strong class="font-medium">Marketinški</strong><br /><span class="text-tekst-meki">Mjerenje oglasa na društvenim mrežama.</span></span>
+    </label>
+  </form>
+
+  <div class="mt-5 grid grid-cols-1 gap-2 xs:grid-cols-3">
+    <button type="button" class="kolacic-gumb" data-odluka="odbij">Odbij sve</button>
+    <button type="button" class="kolacic-gumb" data-odluka="prilagodi" aria-expanded="false" aria-controls="kolacici-postavke">Prilagodi</button>
+    <button type="button" class="kolacic-gumb" data-odluka="prihvati">Prihvati sve</button>
+  </div>
+</section>
+
+<style>
+  /* Jednaka težina: isti oblik, boja, veličina i obrub za sva tri gumba */
+  .kolacic-gumb {
+    min-height: 44px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--color-naglasak);
+    background: transparent;
+    color: var(--color-naglasak);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .kolacic-gumb:hover {
+    background: var(--color-naglasak);
+    color: var(--color-pozadina);
+  }
+</style>
+
+<script>
+  import { animate } from 'motion';
+
+  const KLJUC = 'buncic-privola';
+  const traka = document.getElementById('kolacici')!;
+  const forma = document.getElementById('kolacici-postavke') as HTMLFormElement;
+  const gumbPrilagodi = traka.querySelector<HTMLButtonElement>('[data-odluka="prilagodi"]')!;
+  const smanjeno = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  type Privola = { analitika: boolean; marketing: boolean; datum: string };
+
+  const procitaj = (): Privola | null => {
+    try {
+      return JSON.parse(localStorage.getItem(KLJUC) || 'null');
+    } catch {
+      return null;
+    }
+  };
+
+  const pokazi = (animiraj = true) => {
+    const p = procitaj();
+    (forma.elements.namedItem('analitika') as HTMLInputElement).checked = !!p?.analitika;
+    (forma.elements.namedItem('marketing') as HTMLInputElement).checked = !!p?.marketing;
+    traka.hidden = false;
+    document.documentElement.removeAttribute('data-privola');
+    document.documentElement.toggleAttribute('data-kolacici-otvoreni', true);
+    if (animiraj && !smanjeno) animate(traka, { opacity: [0, 1], y: [24, 0] }, { duration: 0.5, ease: [0.16, 1, 0.3, 1] });
+  };
+
+  const spremi = async (analitika: boolean, marketing: boolean) => {
+    const privola: Privola = { analitika, marketing, datum: new Date().toISOString() };
+    try {
+      localStorage.setItem(KLJUC, JSON.stringify(privola));
+    } catch {}
+    window.dispatchEvent(new CustomEvent('privola:promjena', { detail: privola }));
+    if (!smanjeno) await animate(traka, { opacity: 0, y: 16 }, { duration: 0.25 });
+    traka.hidden = true;
+    document.documentElement.setAttribute('data-privola', '');
+    forma.hidden = true;
+    gumbPrilagodi.textContent = 'Prilagodi';
+    gumbPrilagodi.setAttribute('aria-expanded', 'false');
+    document.documentElement.removeAttribute('data-kolacici-otvoreni');
+  };
+
+  traka.addEventListener('click', (e) => {
+    const odluka = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-odluka]')?.dataset.odluka;
+    if (odluka === 'prihvati') spremi(true, true);
+    if (odluka === 'odbij') spremi(false, false);
+    if (odluka === 'prilagodi') {
+      if (forma.hidden) {
+        forma.hidden = false;
+        gumbPrilagodi.textContent = 'Spremi odabir';
+        gumbPrilagodi.setAttribute('aria-expanded', 'true');
+        if (!smanjeno) animate(forma, { opacity: [0, 1] }, { duration: 0.3 });
+      } else {
+        const f = new FormData(forma);
+        spremi(f.has('analitika'), f.has('marketing'));
+      }
+    }
+  });
+
+  document.querySelectorAll('[data-kolacici-postavke]').forEach((b) => b.addEventListener('click', () => pokazi()));
+
+  // Banner je već vidljiv iz HTML-a (bez odgode, da ne postane kasni LCP element)
+  if (!procitaj()) pokazi(false);
+  else traka.hidden = true;
+</script>

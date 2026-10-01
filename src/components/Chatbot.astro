@@ -1,0 +1,158 @@
+---
+/*
+  Vizualni placeholder za AI chatbot. Sučelje je gotovo; za spajanje na backend
+  zamijeni funkciju posaljiPoruku() u skripti ispod (npr. fetch na /api/chat).
+*/
+import Ikona from './Ikona.astro';
+
+const brzaPitanja = ['Imate li slobodan termin za vjenčanje?', 'Kolika je cijena noćenja?', 'Radno vrijeme restorana'];
+---
+
+<div id="chatbot" class="chatbot fixed bottom-4 right-4 z-[44] sm:bottom-6 sm:right-6">
+  <div
+    id="chat-prozor"
+    class="absolute bottom-[4.5rem] right-0 flex h-[min(560px,calc(100dvh-7rem))] w-[min(380px,calc(100vw-2rem))] origin-bottom-right flex-col border border-rub/15 bg-pozadina text-tekst shadow-[0_30px_80px_-24px_rgba(61,28,18,0.5)]"
+    role="dialog"
+    aria-label="Razgovor s asistentom"
+    hidden
+  >
+    <div class="flex items-center gap-3 bg-bordo-900 px-4 py-3 text-krem">
+      <img src="/logo.svg" alt="" width="28" height="32" class="h-8 w-auto" />
+      <div class="min-w-0 flex-1">
+        <p class="font-display text-base leading-tight">Asistent imanja Bunčić</p>
+        <p class="text-xs text-krem/75">Odgovara odmah, 0-24</p>
+      </div>
+      <button type="button" class="inline-flex h-11 w-11 items-center justify-center" aria-label="Zatvori razgovor" data-chat-zatvori>
+        <Ikona ime="x" velicina={22} />
+      </button>
+    </div>
+
+    <div class="flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-5" id="chat-poruke" aria-live="polite">
+      <div class="max-w-[85%] bg-pozadina-2 px-4 py-3 text-[0.9375rem] leading-relaxed">
+        Dobar dan! Mogu vam pomoći oko termina za vjenčanje, smještaja, jelovnika ili radnog vremena. Što vas zanima?
+      </div>
+    </div>
+
+    <div class="flex gap-2 overflow-x-auto px-4 pb-3" data-chat-brza>
+      {
+        brzaPitanja.map((p) => (
+          <button type="button" class="shrink-0 border border-naglasak/40 px-3 py-2 text-left text-sm text-naglasak transition-colors hover:bg-bordo hover:text-krem">
+            {p}
+          </button>
+        ))
+      }
+    </div>
+
+    <form class="flex items-center gap-2 border-t border-rub/10 p-3" data-chat-forma>
+      <label for="chat-unos" class="sr-only">Vaša poruka</label>
+      <input
+        id="chat-unos"
+        name="poruka"
+        type="text"
+        autocomplete="off"
+        placeholder="Npr. slobodan termin u lipnju…"
+        class="min-h-11 flex-1 border border-rub/25 bg-povrsina px-3 text-[0.9375rem] placeholder:text-tekst-meki/80 focus:border-naglasak"
+      />
+      <button type="submit" class="inline-flex h-11 w-11 shrink-0 items-center justify-center bg-bordo text-krem hover:bg-bordo-700" aria-label="Pošalji poruku">
+        <Ikona ime="paper-plane-right" velicina={20} />
+      </button>
+    </form>
+  </div>
+
+  <button
+    type="button"
+    class="chat-gumb relative inline-flex h-14 w-14 items-center justify-center rounded-full bg-bordo text-krem shadow-[0_12px_30px_-8px_rgba(61,28,18,0.6)] transition-colors hover:bg-bordo-700"
+    aria-expanded="false"
+    aria-controls="chat-prozor"
+    aria-label="Otvori razgovor s asistentom"
+    data-chat-gumb
+  >
+    <Ikona ime="chat-circle-dots" velicina={28} class="ikona-otvori" />
+    <Ikona ime="x" velicina={24} class="ikona-zatvori hidden" />
+  </button>
+</div>
+
+<style>
+  /* Dok je traka kolačića otvorena na mobitelu, chat gumb se skriva da se ne preklapaju */
+  @media (max-width: 639px) {
+    :global(html[data-kolacici-otvoreni]) .chatbot {
+      display: none;
+    }
+  }
+  .chat-gumb[aria-expanded='true'] :global(.ikona-otvori) {
+    display: none;
+  }
+  .chat-gumb[aria-expanded='true'] :global(.ikona-zatvori) {
+    display: block;
+  }
+</style>
+
+<script>
+  import { animate } from 'motion';
+
+  const smanjeno = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const gumb = document.querySelector<HTMLButtonElement>('[data-chat-gumb]')!;
+  const prozor = document.getElementById('chat-prozor')!;
+  const poruke = document.getElementById('chat-poruke')!;
+  const forma = document.querySelector<HTMLFormElement>('[data-chat-forma]')!;
+  const unos = document.getElementById('chat-unos') as HTMLInputElement;
+
+  const otvori = () => {
+    prozor.hidden = false;
+    gumb.setAttribute('aria-expanded', 'true');
+    gumb.setAttribute('aria-label', 'Zatvori razgovor s asistentom');
+    if (!smanjeno) animate(prozor, { opacity: [0, 1], scale: [0.94, 1], y: [12, 0] }, { type: 'spring', stiffness: 260, damping: 26 });
+    unos.focus();
+  };
+  const zatvori = async () => {
+    gumb.setAttribute('aria-expanded', 'false');
+    gumb.setAttribute('aria-label', 'Otvori razgovor s asistentom');
+    if (!smanjeno) await animate(prozor, { opacity: 0, scale: 0.96, y: 8 }, { duration: 0.18 });
+    prozor.hidden = true;
+  };
+
+  gumb.addEventListener('click', () => (prozor.hidden ? otvori() : zatvori()));
+  document.querySelector('[data-chat-zatvori]')!.addEventListener('click', () => {
+    zatvori();
+    gumb.focus();
+  });
+  prozor.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      zatvori();
+      gumb.focus();
+    }
+  });
+
+  const dodaj = (tekst: string, od: 'gost' | 'bot') => {
+    const el = document.createElement('div');
+    el.className =
+      od === 'gost'
+        ? 'ml-auto max-w-[85%] bg-bordo px-4 py-3 text-[0.9375rem] leading-relaxed text-krem'
+        : 'max-w-[85%] bg-pozadina-2 px-4 py-3 text-[0.9375rem] leading-relaxed';
+    el.textContent = tekst;
+    poruke.appendChild(el);
+    if (!smanjeno) animate(el, { opacity: [0, 1], y: [8, 0] }, { duration: 0.3 });
+    poruke.scrollTop = poruke.scrollHeight;
+  };
+
+  // PLACEHOLDER: ovdje se spaja pravi AI backend
+  const posaljiPoruku = async (tekst: string) => {
+    dodaj(tekst, 'gost');
+    await new Promise((r) => setTimeout(r, 700));
+    dodaj(
+      'Asistent je trenutno u pripremi. Za brzi odgovor nazovite nas na 01 2781-133 ili pošaljite upit preko stranice Kontakt.',
+      'bot',
+    );
+  };
+
+  forma.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const tekst = unos.value.trim();
+    if (!tekst) return;
+    unos.value = '';
+    posaljiPoruku(tekst);
+  });
+  document.querySelectorAll<HTMLButtonElement>('[data-chat-brza] button').forEach((b) =>
+    b.addEventListener('click', () => posaljiPoruku(b.textContent!.trim())),
+  );
+</script>

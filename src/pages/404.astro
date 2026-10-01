@@ -1,0 +1,17 @@
+---
+import Osnovni from '../layouts/Osnovni.astro';
+---
+
+<Osnovni naslov="Stranica nije pronađena | Obitelj Bunčić" opis="Tražena stranica ne postoji ili je premještena.">
+  <section class="okvir flex min-h-[70dvh] flex-col items-start justify-center py-24">
+    <div data-hero>
+      <p class="font-display text-8xl text-naglasak md:text-9xl">404</p>
+      <h1 class="mt-4 text-4xl leading-tight tracking-tight md:text-5xl">Ova stranica je zalutala u vinograd.</h1>
+      <p class="mt-5 max-w-[46ch] text-lg leading-relaxed text-tekst-meki">Stranica koju tražite ne postoji ili je premještena. Vratite se na početnu ili pogledajte ponudu.</p>
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a href="/" class="gumb-primarni">Na početnu</a>
+        <a href="/#ponuda" class="gumb-obrub text-naglasak">Pogledajte ponudu</a>
+      </div>
+    </div>
+  </section>
+</Osnovni>

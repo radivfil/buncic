@@ -1,0 +1,75 @@
+---
+import { Picture } from 'astro:assets';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Osnovni from '../../layouts/Osnovni.astro';
+import Ikona from '../../components/Ikona.astro';
+import KarticaNovosti from '../../components/KarticaNovosti.astro';
+import { formatirajDatum } from '../../lib/datum';
+
+export async function getStaticPaths() {
+  const objave = await getCollection('novosti');
+  return objave.map((objava) => ({ params: { id: objava.id }, props: { objava } }));
+}
+
+const { objava } = Astro.props as { objava: CollectionEntry<'novosti'> };
+const { Content } = await render(objava);
+const d = objava.data;
+const ostale = (await getCollection('novosti'))
+  .filter((o) => o.id !== objava.id)
+  .sort((a, b) => +b.data.datum - +a.data.datum)
+  .slice(0, 2);
+
+const shema = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: d.naslov,
+  datePublished: d.datum.toISOString(),
+  description: d.sazetak,
+  publisher: { '@type': 'Organization', name: 'Obitelj Bunčić', logo: { '@type': 'ImageObject', url: 'https://buncic.hr/logo.svg' } },
+};
+---
+
+<Osnovni naslov={`${d.naslov} | Obitelj Bunčić`} opis={d.sazetak} slika={d.naslovnica} tipStranice="article" shema={shema}>
+  <article class="okvir grid gap-12 pb-24 pt-12 lg:grid-cols-12 lg:gap-16 lg:pb-32 lg:pt-20">
+    <div class="lg:col-span-7" data-hero>
+      <nav aria-label="Putanja" class="text-sm text-tekst-meki">
+        <a href="/novosti" class="inline-flex items-center gap-2 hover:text-naglasak"><Ikona ime="arrow-left" velicina={16} /> Novosti i događanja</a>
+      </nav>
+      <p class="mt-8 text-sm text-tekst-meki">
+        <span class="font-medium text-naglasak">{d.kategorija}</span>
+        <span aria-hidden="true" class="mx-2">/</span>
+        <time datetime={d.datum.toISOString().slice(0, 10)}>{formatirajDatum(d.datum)}</time>
+      </p>
+      <h1 class="mt-4 text-4xl leading-[1.08] tracking-tight md:text-6xl">{d.naslov}</h1>
+      <div class="proza mt-10 max-w-[62ch] text-lg leading-relaxed text-tekst-meki">
+        <Content />
+      </div>
+      <div class="mt-12 flex flex-wrap gap-3 border-t border-rub/15 pt-8">
+        <a href="/kontakt" class="gumb-primarni">Pošaljite upit</a>
+        <a href="tel:+38512781133" class="gumb-obrub text-naglasak"><Ikona ime="phone" velicina={18} /> 01 2781-133</a>
+      </div>
+    </div>
+    <div class="lg:col-span-5">
+      <div class="lg:sticky lg:top-28" data-hero-slika>
+        <Picture
+          src={d.naslovnica}
+          alt={d.naslovnicaAlt}
+          formats={['avif', 'webp']}
+          widths={[480, 800, 1080]}
+          sizes="(min-width: 1024px) 38vw, 100vw"
+          loading="eager"
+          class="w-full"
+        />
+      </div>
+    </div>
+  </article>
+
+  <section class="bg-pozadina-2/60 py-20" aria-labelledby="jos-naslov">
+    <div class="okvir">
+      <h2 id="jos-naslov" class="text-3xl md:text-4xl">Još s imanja</h2>
+      <div class="mt-10 grid gap-10 md:grid-cols-2" data-reveal-grupa>
+        {ostale.map((o) => <div data-reveal><KarticaNovosti objava={o} vodoravna /></div>)}
+      </div>
+    </div>
+  </section>
+</Osnovni>

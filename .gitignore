@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+.playwright-mcp/
+.playwright-cli/*.png
+.playwright-cli/*.yml
+.playwright-cli/dbg.js
+
+# Alati i radni materijali (ne idu u javni repo)
+.playwright-cli/
+.claude/
+.agents/
+.impeccable/
+lighthouse/
+reference/

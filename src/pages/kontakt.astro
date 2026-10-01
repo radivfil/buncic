@@ -1,0 +1,172 @@
+---
+import { getEntry } from 'astro:content';
+import { Picture } from 'astro:assets';
+import Osnovni from '../layouts/Osnovni.astro';
+import Ikona from '../components/Ikona.astro';
+import Obrazac from '../components/Obrazac.astro';
+import Karta from '../components/Karta.astro';
+import zgrada from '../assets/images/pocetna/klet-zgrada.jpg';
+
+const postavke = (await getEntry('postavke', 'opce'))!.data;
+const tel = (b: string) => `tel:${b.replace(/[^\d+]/g, '')}`;
+
+const kartice = [
+  { id: 'dogadjaj', naziv: 'Vjenčanja i proslave', ikona: 'champagne' },
+  { id: 'smjestaj', naziv: 'Smještaj', ikona: 'bed' },
+  { id: 'opci', naziv: 'Opći upit', ikona: 'envelope-simple' },
+] as const;
+---
+
+<Osnovni
+  naslov="Kontakt | Obitelj Bunčić, Dugo Selo"
+  opis="Kontakt Kleti obitelji Bunčić, Šaškovečka 182, Dugo Selo. Telefon 01 2781-133, info@buncic.hr. Upiti za vjenčanja, proslave i smještaj."
+  slika={zgrada}
+>
+  <section class="okvir grid gap-10 pb-16 pt-16 lg:grid-cols-12 lg:pt-24">
+    <div class="lg:col-span-7" data-hero>
+      <h1 class="text-5xl leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">Kontakt</h1>
+      <p class="mt-6 max-w-[48ch] text-lg leading-relaxed text-tekst-meki">
+        Za sve informacije i rezervacije nazovite nas ili ispunite obrazac. Odgovaramo unutar jednog radnog dana.
+      </p>
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a href="tel:+38512781133" class="gumb-primarni"><Ikona ime="phone" velicina={18} /> 01 2781-133</a>
+        <a href={`mailto:${postavke.email}`} class="gumb-obrub text-naglasak"><Ikona ime="envelope-simple" velicina={18} /> {postavke.email}</a>
+      </div>
+    </div>
+    <div class="hidden lg:col-span-4 lg:col-start-9 lg:block" data-hero-slika>
+      <div class="aspect-[4/5] overflow-hidden">
+        <Picture src={zgrada} alt="Pročelje Kleti obitelji Bunčić" formats={['avif', 'webp']} widths={[400, 700]} sizes="30vw" loading="eager" class="h-full w-full object-cover object-[30%_50%]" />
+      </div>
+    </div>
+  </section>
+
+  <!-- OBRASCI: tri zasebna obrasca u karticama -->
+  <section id="upit" class="bg-pozadina-2/60 py-20 lg:py-28" aria-labelledby="upit-naslov">
+    <div class="okvir">
+      <h2 id="upit-naslov" class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Pošaljite upit</h2>
+      <div class="mt-10 flex flex-wrap gap-2" role="tablist" aria-label="Vrsta upita" data-kartice>
+        {
+          kartice.map((k, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`kartica-${k.id}`}
+              aria-controls={`ploca-${k.id}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class="kartica inline-flex min-h-12 items-center gap-2 border px-5"
+              data-kartica={k.id}
+            >
+              <Ikona ime={k.ikona} velicina={20} />
+              {k.naziv}
+            </button>
+          ))
+        }
+      </div>
+      <div class="mt-6 bg-pozadina p-6 sm:p-10">
+        {
+          kartice.map((k, i) => (
+            <div role="tabpanel" id={`ploca-${k.id}`} aria-labelledby={`kartica-${k.id}`} hidden={i !== 0} data-ploca={k.id} tabindex="0">
+              <Obrazac vrsta={k.id} id={`kontakt-${k.id}`} prigoda={k.id === 'dogadjaj' ? 'Vjenčanje' : undefined} />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- LOKACIJE -->
+  <section class="okvir py-24 lg:py-32" aria-labelledby="lokacije-naslov">
+    <h2 id="lokacije-naslov" class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Gdje smo</h2>
+    <div class="mt-12 grid gap-12 md:grid-cols-2 lg:grid-cols-12" data-reveal-grupa>
+      {
+        postavke.lokacije.map((l, i) => (
+          <div class:list={['border-t-2 pt-8', i === 0 ? 'border-naglasak lg:col-span-5' : 'border-rub/20 lg:col-span-3', i === 2 && 'md:col-span-2 lg:col-span-4']} data-reveal>
+            <h3 class="font-display text-2xl md:text-3xl">{l.naziv}</h3>
+            <address class="mt-5 space-y-2 not-italic text-tekst-meki">
+              <p class="flex gap-3"><Ikona ime="map-pin" velicina={20} class="mt-0.5 shrink-0 text-naglasak" />{l.adresa}</p>
+              {l.telefoni.map((t) => (
+                <a href={tel(t)} class="flex gap-3 hover:text-naglasak"><Ikona ime="phone" velicina={20} class="mt-0.5 shrink-0 text-naglasak" />{t}</a>
+              ))}
+              {l.email && (
+                <a href={`mailto:${l.email}`} class="flex gap-3 hover:text-naglasak"><Ikona ime="envelope-simple" velicina={20} class="mt-0.5 shrink-0 text-naglasak" />{l.email}</a>
+              )}
+            </address>
+            {l.radnoVrijeme.length > 0 && (
+              <ul class="mt-5 space-y-1 text-sm text-tekst-meki">
+                {l.radnoVrijeme.map((r) => <li>{r}</li>)}
+              </ul>
+            )}
+            {i === 0 && (
+              <a href={postavke.kartaUrl} target="_blank" rel="noopener" class="poveznica mt-6 text-naglasak">
+                Otvori u Google kartama <Ikona ime="arrow-up-right" velicina={16} />
+              </a>
+            )}
+          </div>
+        ))
+      }
+    </div>
+    <div class="mt-20 border-t border-rub/15 pt-16" data-reveal>
+      <Karta
+        naziv={postavke.lokacije[0].naziv}
+        adresa={postavke.lokacije[0].adresa}
+        koordinate={postavke.lokacije[0].koordinate!}
+        upute={['Imanje je na Martin bregu, iznad središta Dugog Sela.', 'Parkiralište pod nadzorom i podzemna garaža na imanju.']}
+      />
+    </div>
+    <p class="mt-16 max-w-[70ch] text-sm leading-relaxed text-tekst-meki">
+      {postavke.tvrtka.naziv}, vl. {postavke.tvrtka.vlasnica}. OIB: {postavke.tvrtka.oib}. PDV broj: {postavke.tvrtka.pdv}. IBAN: {postavke.tvrtka.iban}.
+    </p>
+  </section>
+</Osnovni>
+
+<style>
+  .kartica {
+    border-color: color-mix(in srgb, var(--color-rub) 25%, transparent);
+    color: var(--color-tekst);
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .kartica:hover {
+    border-color: var(--color-naglasak);
+  }
+  .kartica[aria-selected='true'] {
+    background: var(--color-naglasak);
+    border-color: var(--color-naglasak);
+    color: var(--color-pozadina);
+  }
+</style>
+
+<script>
+  import { animate } from 'motion';
+  const kartice = [...document.querySelectorAll<HTMLButtonElement>('[data-kartica]')];
+  const odaberi = (id: string, fokus = false) => {
+    kartice.forEach((k) => {
+      const da = k.dataset.kartica === id;
+      k.setAttribute('aria-selected', String(da));
+      k.tabIndex = da ? 0 : -1;
+      if (da && fokus) k.focus();
+    });
+    document.querySelectorAll<HTMLElement>('[data-ploca]').forEach((p) => {
+      p.hidden = p.dataset.ploca !== id;
+      if (!p.hidden && !matchMedia('(prefers-reduced-motion: reduce)').matches) animate(p, { opacity: [0, 1], y: [8, 0] }, { duration: 0.35 });
+    });
+  };
+  kartice.forEach((k, i) => {
+    k.addEventListener('click', () => {
+      odaberi(k.dataset.kartica!);
+      history.replaceState(null, '', '#' + k.dataset.kartica);
+    });
+    k.addEventListener('keydown', (e) => {
+      const smjer = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!smjer) return;
+      e.preventDefault();
+      odaberi(kartice[(i + smjer + kartice.length) % kartice.length].dataset.kartica!, true);
+    });
+  });
+  // Poveznica /kontakt#smjestaj ili #opci otvara odgovarajući obrazac
+  const hash = location.hash.replace('#', '');
+  if (kartice.some((k) => k.dataset.kartica === hash)) {
+    odaberi(hash);
+    document.getElementById('upit')?.scrollIntoView();
+  }
+</script>

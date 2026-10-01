@@ -1,0 +1,446 @@
+---
+import { getCollection } from 'astro:content';
+import Ikona from './Ikona.astro';
+
+interface Props {
+  /** Zaglavlje leži preko hero fotografije dok se ne krene skrolati */
+  preko?: boolean;
+  tema?: 'svijetla' | 'podrum';
+}
+
+const { preko = false, tema = 'svijetla' } = Astro.props;
+const ponuda = (await getCollection('ponuda')).sort((a, b) => a.data.redoslijed - b.data.redoslijed);
+const put = Astro.url.pathname.replace(/\/$/, '') || '/';
+const aktivno = (href: string) => (href === '/' ? put === '/' : put.startsWith(href));
+const uPonudi = put.startsWith('/ponuda');
+---
+
+<div id="vrh-straze" class="pointer-events-none absolute inset-x-0 top-0 h-24" aria-hidden="true"></div>
+
+<header
+  id="zaglavlje"
+  data-preko={preko ? '' : undefined}
+  data-tema={tema}
+  class="zaglavlje fixed inset-x-0 top-0 z-40 transition-[background-color,color,box-shadow] duration-500 ease-out-soft"
+>
+  <a
+    href="#sadrzaj"
+    class="gumb-primarni sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50"
+    >Preskoči na sadržaj</a
+  >
+  <div class="okvir flex h-[72px] items-center justify-between gap-6 lg:h-20">
+    <a href="/" class="flex shrink-0 items-center gap-3" aria-label="Obitelj Bunčić, početna stranica">
+      <img src="/logo.svg" alt="" width="49" height="56" class="h-12 w-auto lg:h-14" />
+      <span class="hidden font-display text-lg leading-tight tracking-tight sm:block" translate="no">
+        Obitelj Bunčić
+        <span class="block font-sans text-[0.8125rem] tracking-normal opacity-80">Klet, Dugo Selo</span>
+      </span>
+    </a>
+
+    <nav aria-label="Glavna navigacija" class="hidden lg:block">
+      <ul class="flex items-center gap-1 text-[0.9375rem]">
+        <li>
+          <a href="/" class="nav-poveznica" aria-current={aktivno('/') ? 'page' : undefined}>Početna</a>
+        </li>
+        <li class="relative" data-padajuci>
+          <button
+            type="button"
+            class="nav-poveznica inline-flex items-center gap-1.5"
+            aria-expanded="false"
+            aria-controls="izbornik-ponuda"
+            data-padajuci-gumb
+            data-aktivno={uPonudi ? '' : undefined}
+          >
+            Ponuda
+            <Ikona ime="caret-down" velicina={14} class="strelica transition-transform duration-300" />
+          </button>
+          <div
+            id="izbornik-ponuda"
+            class="padajuci absolute left-1/2 top-full w-[560px] -translate-x-1/2 pt-3"
+            hidden
+            data-padajuci-ploca
+          >
+            <div class="border border-rub/10 bg-pozadina p-3 text-tekst shadow-[0_24px_60px_-20px_rgba(61,28,18,0.35)]">
+              <ul class="grid grid-cols-2 gap-1">
+                {
+                  ponuda.map((p) => (
+                    <li>
+                      <a
+                        href={`/ponuda/${p.id}`}
+                        class="group block px-4 py-3 transition-colors hover:bg-pozadina-2 focus-visible:bg-pozadina-2"
+                        aria-current={aktivno(`/ponuda/${p.id}`) ? 'page' : undefined}
+                      >
+                        <span class="flex items-center justify-between font-display text-lg text-naglasak">
+                          {p.data.nazivIzbornik}
+                          <Ikona
+                            ime="arrow-right"
+                            velicina={16}
+                            class="-translate-x-1 opacity-0 transition-[transform,opacity] duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                          />
+                        </span>
+                        <span class="mt-0.5 block text-sm text-tekst-meki">{p.data.opisIzbornik}</span>
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+        </li>
+        <li>
+          <a href="/novosti" class="nav-poveznica" aria-current={aktivno('/novosti') ? 'page' : undefined}
+            >Novosti i događanja</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href="tel:+38512781133" class="nav-poveznica items-center gap-2" aria-label="Nazovite nas: 01 2781-133">
+        <Ikona ime="phone" velicina={20} />
+        <span class="hidden xs:inline">01 2781-133</span>
+      </a>
+      <button
+        type="button"
+        class="prekidac-teme inline-flex h-11 w-11 items-center justify-center opacity-90 transition-opacity hover:opacity-100"
+        aria-label="Uključi tamni način"
+        aria-pressed="false"
+        data-prekidac-teme
+      >
+        <Ikona ime="moon" velicina={22} class="ikona-mjesec" />
+        <Ikona ime="sun" velicina={22} class="ikona-sunce" />
+      </button>
+      <a
+        href="/kontakt"
+        class="kontakt-cta gumb hidden min-h-11 px-5 sm:inline-flex"
+        aria-current={aktivno('/kontakt') ? 'page' : undefined}>Kontakt</a
+      >
+      <button
+        type="button"
+        class="-mr-2 inline-flex h-12 w-12 items-center justify-center lg:hidden"
+        aria-expanded="false"
+        aria-controls="mobilni-izbornik"
+        aria-label="Otvori izbornik"
+        data-mobilni-gumb
+      >
+        <Ikona ime="list" velicina={28} />
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobilni izbornik -->
+<div
+  id="mobilni-izbornik"
+  class="fixed inset-0 z-50 flex flex-col overflow-y-auto overscroll-contain bg-podrum text-krem lg:hidden"
+  hidden
+  role="dialog"
+  aria-modal="true"
+  aria-label="Izbornik"
+  data-mobilni-ploca
+>
+  <div class="okvir flex h-[72px] shrink-0 items-center justify-between">
+    <a href="/" class="flex items-center gap-3" aria-label="Obitelj Bunčić, početna stranica">
+      <img src="/logo.svg" alt="" width="42" height="48" class="h-12 w-auto" />
+      <span class="font-display text-lg">Obitelj Bunčić</span>
+    </a>
+    <button
+      type="button"
+      class="-mr-2 inline-flex h-12 w-12 items-center justify-center"
+      aria-label="Zatvori izbornik"
+      data-mobilni-zatvori
+    >
+      <Ikona ime="x" velicina={28} />
+    </button>
+  </div>
+  <nav aria-label="Mobilna navigacija" class="okvir flex flex-1 flex-col pb-10 pt-6">
+    <ul class="flex flex-col gap-1 font-display text-3xl">
+      <li data-mob-stavka><a href="/" class="block py-2">Početna</a></li>
+      <li data-mob-stavka>
+        <button
+          type="button"
+          class="flex w-full items-center justify-between py-2 text-left"
+          aria-expanded={uPonudi ? 'true' : 'false'}
+          aria-controls="mob-ponuda"
+          data-mob-ponuda-gumb
+        >
+          Ponuda
+          <Ikona ime="caret-down" velicina={22} class="strelica transition-transform duration-300" />
+        </button>
+        <ul id="mob-ponuda" class="mb-2 border-l border-zlato/40 pl-5 font-sans text-lg" hidden={!uPonudi}>
+          {
+            ponuda.map((p) => (
+              <li>
+                <a href={`/ponuda/${p.id}`} class="block py-2 text-krem/85 hover:text-krem" aria-current={aktivno(`/ponuda/${p.id}`) ? 'page' : undefined}>
+                  {p.data.nazivIzbornik}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </li>
+      <li data-mob-stavka><a href="/novosti" class="block py-2">Novosti i događanja</a></li>
+    </ul>
+    <div class="mt-auto flex flex-col gap-4 pt-10" data-mob-stavka>
+      <a href="/kontakt" class="gumb-svijetli w-full">Kontakt</a>
+      <a href="tel:+38512781133" class="inline-flex items-center gap-2 text-krem/85">
+        <Ikona ime="phone" velicina={18} /> 01 2781-133
+      </a>
+    </div>
+  </nav>
+</div>
+
+<style>
+  /* Stanja zaglavlja: preko hero fotografije je prozirno i svijetlog teksta */
+  .zaglavlje {
+    background-color: color-mix(in srgb, var(--color-pozadina) 94%, transparent);
+    color: var(--color-tekst);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-rub) 10%, transparent);
+    backdrop-filter: blur(10px);
+  }
+  .zaglavlje[data-tema='podrum'] {
+    background-color: rgb(29 20 17 / 0.94);
+    color: var(--color-krem);
+    box-shadow: 0 1px 0 rgb(220 197 146 / 0.12);
+  }
+  .zaglavlje[data-preko]:not([data-skrolano]) {
+    background-color: transparent;
+    color: var(--color-krem);
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  .zaglavlje[data-preko]:not([data-skrolano])::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 -40px 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgb(29 20 17 / 0.55), transparent);
+  }
+
+  .nav-poveznica {
+    position: relative;
+    padding: 0.625rem 0.875rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.92;
+    transition: opacity 0.2s;
+  }
+  .nav-poveznica:hover {
+    opacity: 1;
+  }
+  .nav-poveznica::after {
+    content: '';
+    position: absolute;
+    left: 0.875rem;
+    right: 0.875rem;
+    bottom: 0.35rem;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--ease-out-soft);
+  }
+  .nav-poveznica:hover::after,
+  .nav-poveznica[aria-current='page']::after,
+  .nav-poveznica[data-aktivno]::after,
+  .nav-poveznica[aria-expanded='true']::after {
+    transform: scaleX(1);
+  }
+  /* Prekidač teme: mjesec u svijetloj, sunce u tamnoj temi */
+  .prekidac-teme :global(.ikona-sunce) {
+    display: none;
+  }
+  :global(html[data-tema='tamna']) .prekidac-teme :global(.ikona-sunce) {
+    display: block;
+  }
+  :global(html[data-tema='tamna']) .prekidac-teme :global(.ikona-mjesec) {
+    display: none;
+  }
+  /* Na tamnim stranicama (catering, restoran) tema ne mijenja izgled, pa se prekidač ne prikazuje */
+  .zaglavlje[data-tema='podrum'] .prekidac-teme {
+    display: none;
+  }
+
+  [aria-expanded='true'] > :global(.strelica) {
+    transform: rotate(180deg);
+  }
+
+  .kontakt-cta {
+    background: var(--color-bordo);
+    color: var(--color-krem);
+  }
+  .kontakt-cta:hover {
+    background: var(--color-bordo-700);
+  }
+  .zaglavlje[data-tema='podrum'] .kontakt-cta,
+  .zaglavlje[data-preko]:not([data-skrolano]) .kontakt-cta {
+    background: var(--color-krem);
+    color: var(--color-bordo-900);
+  }
+  .zaglavlje[data-tema='podrum'] .kontakt-cta:hover,
+  .zaglavlje[data-preko]:not([data-skrolano]) .kontakt-cta:hover {
+    background: var(--color-zlato-300);
+  }
+</style>
+
+<script>
+  import { animate, stagger } from 'motion';
+
+  const smanjeno = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Prekidač svijetle / tamne teme (spremljen u localStorage, prati sustav dok korisnik ne odabere)
+  const html = document.documentElement;
+  const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  const gumbTeme = document.querySelector<HTMLButtonElement>('[data-prekidac-teme]');
+  const osvjeziTemu = () => {
+    const tamna = html.dataset.tema === 'tamna';
+    gumbTeme?.setAttribute('aria-pressed', String(tamna));
+    gumbTeme?.setAttribute('aria-label', tamna ? 'Uključi svijetli način' : 'Uključi tamni način');
+    if (meta && !meta.hasAttribute('data-podrum')) meta.content = tamna ? '#1a1310' : '#f4eee3';
+  };
+  osvjeziTemu();
+  gumbTeme?.addEventListener('click', () => {
+    html.dataset.tema = html.dataset.tema === 'tamna' ? 'svijetla' : 'tamna';
+    try {
+      localStorage.setItem('buncic-tema', html.dataset.tema);
+    } catch {}
+    osvjeziTemu();
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    let spremljeno = null;
+    try {
+      spremljeno = localStorage.getItem('buncic-tema');
+    } catch {}
+    if (spremljeno) return;
+    html.dataset.tema = e.matches ? 'tamna' : 'svijetla';
+    osvjeziTemu();
+  });
+  const zaglavlje = document.getElementById('zaglavlje')!;
+  const straza = document.getElementById('vrh-straze');
+
+  // Stanje "skrolano" preko IntersectionObservera, bez scroll listenera
+  if (straza) {
+    new IntersectionObserver(([e]) => {
+      zaglavlje.toggleAttribute('data-skrolano', !e.isIntersecting);
+    }).observe(straza);
+  }
+
+  // Padajući izbornik "Ponuda"
+  const padajuci = document.querySelector<HTMLElement>('[data-padajuci]');
+  if (padajuci) {
+    const gumb = padajuci.querySelector<HTMLButtonElement>('[data-padajuci-gumb]')!;
+    const ploca = padajuci.querySelector<HTMLElement>('[data-padajuci-ploca]')!;
+    const stavke = () => ploca.querySelectorAll('li');
+    let otvoreno = false;
+    let timer: number | undefined;
+
+    const otvori = () => {
+      clearTimeout(timer);
+      if (otvoreno) return;
+      otvoreno = true;
+      ploca.hidden = false;
+      gumb.setAttribute('aria-expanded', 'true');
+      if (smanjeno()) return;
+      animate(ploca, { opacity: [0, 1], y: [-8, 0] }, { duration: 0.35, ease: [0.16, 1, 0.3, 1] });
+      animate(stavke(), { opacity: [0, 1], y: [6, 0] }, { duration: 0.3, delay: stagger(0.03, { startDelay: 0.05 }) });
+    };
+    const zatvori = async () => {
+      if (!otvoreno) return;
+      otvoreno = false;
+      gumb.setAttribute('aria-expanded', 'false');
+      if (!smanjeno()) {
+        await animate(ploca, { opacity: 0, y: -6 }, { duration: 0.2, ease: 'easeIn' });
+      }
+      if (!otvoreno) ploca.hidden = true;
+    };
+
+    // Ako je izbornik otvoren prelaskom miša, klik ga "zaključa" otvorenim umjesto da ga zatvori
+    let odHovera = false;
+    gumb.addEventListener('click', () => {
+      if (otvoreno && odHovera) {
+        odHovera = false;
+        return;
+      }
+      otvoreno ? zatvori() : otvori();
+    });
+    if (window.matchMedia('(hover: hover)').matches) {
+      padajuci.addEventListener('pointerenter', () => {
+        if (!otvoreno) odHovera = true;
+        otvori();
+      });
+      padajuci.addEventListener('pointerleave', () => {
+        timer = window.setTimeout(zatvori, 180);
+      });
+    }
+    padajuci.addEventListener('focusout', (e) => {
+      if (!padajuci.contains(e.relatedTarget as Node)) zatvori();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && otvoreno) {
+        zatvori();
+        gumb.focus();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!padajuci.contains(e.target as Node)) zatvori();
+    });
+  }
+
+  // Mobilni izbornik
+  const mobGumb = document.querySelector<HTMLButtonElement>('[data-mobilni-gumb]');
+  const mobPloca = document.querySelector<HTMLElement>('[data-mobilni-ploca]');
+  const mobZatvori = document.querySelector<HTMLButtonElement>('[data-mobilni-zatvori]');
+  if (mobGumb && mobPloca && mobZatvori) {
+    const otvoriMob = () => {
+      mobPloca.hidden = false;
+      document.documentElement.style.overflow = 'hidden';
+      mobGumb.setAttribute('aria-expanded', 'true');
+      mobZatvori.focus();
+      if (smanjeno()) return;
+      animate(mobPloca, { opacity: [0, 1] }, { duration: 0.3 });
+      animate(
+        mobPloca.querySelectorAll('[data-mob-stavka]'),
+        { opacity: [0, 1], y: [16, 0] },
+        { duration: 0.5, delay: stagger(0.05, { startDelay: 0.08 }), ease: [0.16, 1, 0.3, 1] },
+      );
+    };
+    const zatvoriMob = async () => {
+      if (!smanjeno()) await animate(mobPloca, { opacity: 0 }, { duration: 0.2 });
+      mobPloca.hidden = true;
+      document.documentElement.style.overflow = '';
+      mobGumb.setAttribute('aria-expanded', 'false');
+      mobGumb.focus();
+    };
+    mobGumb.addEventListener('click', otvoriMob);
+    mobZatvori.addEventListener('click', zatvoriMob);
+    mobPloca.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') zatvoriMob();
+      if (e.key === 'Tab') {
+        const fokusabilni = mobPloca.querySelectorAll<HTMLElement>('a[href], button:not([disabled])');
+        const vidljivi = [...fokusabilni].filter((el) => el.offsetParent !== null);
+        const prvi = vidljivi[0];
+        const zadnji = vidljivi[vidljivi.length - 1];
+        if (e.shiftKey && document.activeElement === prvi) {
+          e.preventDefault();
+          zadnji.focus();
+        } else if (!e.shiftKey && document.activeElement === zadnji) {
+          e.preventDefault();
+          prvi.focus();
+        }
+      }
+    });
+
+    const podGumb = mobPloca.querySelector<HTMLButtonElement>('[data-mob-ponuda-gumb]')!;
+    const podLista = document.getElementById('mob-ponuda')!;
+    podGumb.addEventListener('click', () => {
+      const otvoreno = podGumb.getAttribute('aria-expanded') === 'true';
+      podGumb.setAttribute('aria-expanded', String(!otvoreno));
+      podLista.hidden = otvoreno;
+      if (!otvoreno && !smanjeno()) {
+        animate(podLista.querySelectorAll('li'), { opacity: [0, 1], x: [-8, 0] }, { duration: 0.3, delay: stagger(0.04) });
+      }
+    });
+  }
+</script>

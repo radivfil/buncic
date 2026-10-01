@@ -1,0 +1,26 @@
+[
+  {
+    "id": "r1",
+    "citat": "[UNIJETI STVARNI SADRŽAJ] Kratko iskustvo mladenaca, najviše tri retka. Npr. što ih je najviše oduševilo.",
+    "imena": "[Imena mladenaca]",
+    "datum": "[Mjesec i godina vjenčanja]",
+    "dvorana": "[Dvorana]",
+    "potvrdeno": false
+  },
+  {
+    "id": "r2",
+    "citat": "[UNIJETI STVARNI SADRŽAJ] Drugi citat. Najbolje iz Google recenzija ili poruke zahvale, uz pisano dopuštenje mladenaca.",
+    "imena": "[Imena mladenaca]",
+    "datum": "[Mjesec i godina vjenčanja]",
+    "dvorana": "[Dvorana]",
+    "potvrdeno": false
+  },
+  {
+    "id": "r3",
+    "citat": "[UNIJETI STVARNI SADRŽAJ] Treći citat. Idealno o hrani ili organizaciji, da recenzije pokriju različite teme.",
+    "imena": "[Imena mladenaca]",
+    "datum": "[Mjesec i godina vjenčanja]",
+    "dvorana": "[Dvorana]",
+    "potvrdeno": false
+  }
+]

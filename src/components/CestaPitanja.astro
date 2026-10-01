@@ -1,0 +1,53 @@
+---
+/*
+  FAQ kao nativni <details>/<summary> (radi bez JS-a, tipkovnicom i čitačem ekrana).
+  Dodaje FAQPage strukturirane podatke samo za potvrđene odgovore.
+*/
+import { getCollection } from 'astro:content';
+import Ikona from './Ikona.astro';
+import DemoOznaka from './DemoOznaka.astro';
+
+const pitanja = (await getCollection('faq')).sort((a, b) => a.data.redoslijed - b.data.redoslijed);
+const pola = Math.ceil(pitanja.length / 2);
+const stupci = [pitanja.slice(0, pola), pitanja.slice(pola)];
+const shema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: pitanja
+    .filter((p) => p.data.potvrdeno)
+    .map((p) => ({ '@type': 'Question', name: p.data.pitanje, acceptedAnswer: { '@type': 'Answer', text: p.data.odgovor } })),
+};
+---
+
+<section class="bg-pozadina-2/60 py-24 lg:py-32" aria-labelledby="faq-naslov">
+  <div class="okvir">
+    <h2 id="faq-naslov" class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Česta pitanja</h2>
+    <div class="mt-12 grid gap-x-12 lg:grid-cols-2">
+      {
+        stupci.map((stupac) => (
+          <div class="border-t border-rub/20">
+            {stupac.map((p) => (
+              <details class="pitanje group border-b border-rub/20">
+                <summary class="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-5 font-display text-xl leading-snug md:text-2xl">
+                  {p.data.pitanje}
+                  <Ikona ime="plus" velicina={22} class="shrink-0 text-naglasak transition-transform duration-300 group-open:rotate-45" />
+                </summary>
+                <div class="pb-6 pr-10 leading-relaxed text-tekst-meki">
+                  <DemoOznaka potvrdeno={p.data.potvrdeno} class="mb-3" />
+                  <p>{p.data.odgovor}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+  {shema.mainEntity.length > 0 && <script type="application/ld+json" set:html={JSON.stringify(shema)} />}
+</section>
+
+<style>
+  .pitanje summary::-webkit-details-marker {
+    display: none;
+  }
+</style>

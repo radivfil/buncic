@@ -1,0 +1,177 @@
+---
+import { Picture } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+import Osnovni from '../../layouts/Osnovni.astro';
+import Ikona from '../../components/Ikona.astro';
+import Galerija from '../../components/Galerija.astro';
+import SekcijaUpit from '../../components/SekcijaUpit.astro';
+
+import FotoTraka from '../../components/FotoTraka.astro';
+import DemoOznaka from '../../components/DemoOznaka.astro';
+// ZAMIJENITI PRIJE LAUNCHA: arhivska fotografija (mobitel)
+import staza from '../../assets/images/imanje/staza-sjenica.jpg';
+
+const unos = (await getEntry('ponuda', 'smjestaj'))!;
+const { Content } = await render(unos);
+const d = unos.data;
+
+const sobe = [
+  { tip: 'Jednokrevetne', kreveti: '1 osoba' },
+  { tip: 'Dvokrevetne', kreveti: '2 osobe' },
+  { tip: 'Trokrevetne', kreveti: '3 osobe' },
+  { tip: 'Četverokrevetne', kreveti: '4 osobe' },
+  { tip: 'Depandansa', kreveti: 'do 8 osoba' },
+];
+
+const sadrzaji = [
+  { ikona: 'television-simple', tekst: 'TV sa satelitskim programom' },
+  { ikona: 'snowflake', tekst: 'Klima uređaj' },
+  { ikona: 'wine', tekst: 'Mini bar' },
+  { ikona: 'bathtub', tekst: 'Vlastita kupaonica' },
+  { ikona: 'wifi-high', tekst: 'Internet' },
+  { ikona: 'door-open', tekst: 'Recepcija 0-24' },
+  { ikona: 'car-profile', tekst: 'Parking pod nadzorom' },
+  { ikona: 'garage', tekst: 'Podzemna garaža' },
+];
+
+const zaDjecu = [
+  { ikona: 'tree', naslov: 'Škola u prirodi', opis: 'Cjelodnevni boravak i izleti za vrtiće i škole, uz prijevoz našim autobusom.' },
+  { ikona: 'horse', naslov: 'Konji i kočija', opis: 'Vožnja kočijom oko imanja ili jahanje.' },
+  { ikona: 'park', naslov: 'Igralište i mali zoo', opis: 'Dječje igralište usred voćnjaka i mali zoološki vrt s domaćim životinjama.' },
+];
+---
+
+<Osnovni naslov={d.seoNaslov} opis={d.seoOpis} slika={d.naslovnica} zaglavljePreko>
+  <!-- HERO: fotografija preko cijele širine s trakom za upit (ref. rustikalni boutique hotel) -->
+  <section class="relative isolate overflow-hidden bg-podrum text-krem">
+    <div class="absolute inset-0 -z-10" data-hero-slika>
+      <Picture
+        src={d.naslovnica!}
+        alt={d.naslovnicaAlt!}
+        formats={['avif', 'webp']}
+        widths={[640, 1000, 1600]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        class="h-full w-full object-cover object-[40%_50%]"
+      />
+    </div>
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-podrum/90 via-podrum/40 to-podrum/30"></div>
+    <div class="okvir flex min-h-[78dvh] flex-col justify-end pb-10 pt-32" data-hero>
+      <h1 class="max-w-[14ch] text-5xl leading-[1.05] tracking-tight md:text-7xl">Ostanite dan duže</h1>
+      <p class="mt-6 max-w-[44ch] text-lg leading-relaxed text-krem/90">40 soba na imanju, usred vinograda i voćnjaka, nadomak Zagreba.</p>
+
+      <form class="mt-10 grid grid-cols-2 gap-px bg-krem/20 text-tekst md:grid-cols-[1fr_1fr_0.7fr_0.7fr_auto]" data-brzi-upit aria-label="Brzi upit za smještaj">
+        <label class="flex flex-col gap-1 bg-pozadina px-4 py-3">
+          <span class="text-xs font-medium text-tekst-meki">Dolazak</span>
+          <input type="date" name="dolazak" class="bg-transparent text-base" />
+        </label>
+        <label class="flex flex-col gap-1 bg-pozadina px-4 py-3">
+          <span class="text-xs font-medium text-tekst-meki">Odlazak</span>
+          <input type="date" name="odlazak" class="bg-transparent text-base" />
+        </label>
+        <label class="flex flex-col gap-1 bg-pozadina px-4 py-3">
+          <span class="text-xs font-medium text-tekst-meki">Osobe</span>
+          <input type="number" name="osobe" min="1" value="2" inputmode="numeric" class="bg-transparent text-base" />
+        </label>
+        <label class="flex flex-col gap-1 bg-pozadina px-4 py-3">
+          <span class="text-xs font-medium text-tekst-meki">Sobe</span>
+          <input type="number" name="sobe" min="1" value="1" inputmode="numeric" class="bg-transparent text-base" />
+        </label>
+        <button type="submit" class="gumb-primarni col-span-2 h-full min-h-14 md:col-span-1">Provjerite dostupnost</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- SOBE: tekst i popis tipova soba -->
+  <section class="okvir grid gap-14 py-24 lg:grid-cols-12 lg:py-32">
+    <div class="lg:col-span-6" data-reveal-grupa>
+      <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Sobe za par, obitelj ili cijelo društvo</h2>
+      <div class="proza mt-8 max-w-[58ch] text-lg leading-relaxed text-tekst-meki" data-reveal><Content /></div>
+    </div>
+    <div class="lg:col-span-5 lg:col-start-8" data-reveal>
+      <ul class="border-y-2 border-naglasak/80">
+        {
+          sobe.map((s, i) => (
+            <li class:list={['flex items-baseline justify-between gap-4 py-5', i > 0 && 'border-t border-rub/10']}>
+              <span class="font-display text-2xl">{s.tip}</span>
+              <span class="text-tekst-meki">{s.kreveti}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <!-- Fotografije soba ne postoje u dovoljnoj kvaliteti; mjesto je rezervirano -->
+      <div class="mt-10 flex items-center gap-5 border border-dashed border-rub/30 p-6">
+        <Ikona ime="camera-plus" velicina={36} class="shrink-0 text-naglasak" />
+        <div>
+          <p class="font-display text-xl">Fotografije soba</p>
+          <p class="mt-1 text-sm text-tekst-meki">Ovdje dolazi galerija soba: po jedna fotografija svakog tipa sobe i kupaonice.</p>
+          <DemoOznaka tekst="Klijent dostavlja" class="mt-3" />
+        </div>
+      </div>
+      <ul class="mt-10 grid grid-cols-1 gap-x-6 gap-y-4 xs:grid-cols-2">
+        {
+          sadrzaji.map((s) => (
+            <li class="flex items-center gap-3">
+              <Ikona ime={s.ikona} velicina={24} class="shrink-0 text-naglasak" />
+              {s.tekst}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- GALERIJA: topla rustika, drveni okviri -->
+  <section class="bg-pozadina-2/70 py-24 lg:py-32" aria-labelledby="imanje-naslov">
+    <div class="okvir">
+      <h2 id="imanje-naslov" class="max-w-[20ch] text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Oko vas, imanje</h2>
+      <div class="mt-12">
+        <Galerija slike={d.galerija} varijanta="rustik" id="galerija-smjestaj" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ZA OBITELJI: fotografija preko cijele širine s popisom (mijenja ritam) -->
+  <FotoTraka slika={staza} alt="Popločana staza kroz park imanja uz drvenu sjenicu" poravnanje="lijevo" visina="min-h-[85dvh]">
+    <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl">Za obitelji, vrtiće i škole</h2>
+    <ul class="mt-8 space-y-6">
+      {
+        zaDjecu.map((z) => (
+          <li class="flex gap-4">
+            <Ikona ime={z.ikona} velicina={28} class="mt-1 shrink-0 text-zlato" />
+            <div>
+              <h3 class="font-display text-2xl">{z.naslov}</h3>
+              <p class="mt-1 leading-relaxed text-krem/85">{z.opis}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </FotoTraka>
+
+  <SekcijaUpit
+    naslov="Upit za smještaj"
+    opis="Pošaljite datume i broj osoba. Javit ćemo vam se s potvrdom dostupnosti i cijenom."
+    vrsta="smjestaj"
+  />
+</Osnovni>
+
+<script>
+  // Brzi upit iz hero trake prepisuje vrijednosti u glavni obrazac i skrolira do njega
+  const brzi = document.querySelector<HTMLFormElement>('[data-brzi-upit]');
+  const glavni = document.querySelector<HTMLFormElement>('form[data-obrazac="smjestaj"]');
+  if (brzi && glavni) {
+    const danas = new Date().toISOString().slice(0, 10);
+    brzi.querySelectorAll<HTMLInputElement>('input[type="date"]').forEach((d) => (d.min = danas));
+    brzi.addEventListener('submit', (e) => {
+      e.preventDefault();
+      for (const [k, v] of new FormData(brzi)) {
+        const polje = glavni.querySelector<HTMLInputElement>(`[name="${k}"]`);
+        if (polje && v) polje.value = String(v);
+      }
+      document.getElementById('upit')?.scrollIntoView({ behavior: 'smooth' });
+      glavni.querySelector<HTMLInputElement>('[name="ime"]')?.focus({ preventScroll: true });
+    });
+  }
+</script>

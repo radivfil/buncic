@@ -1,0 +1,136 @@
+---
+/*
+  Galerija u bento rasporedu (CSS grid) s preglednikom slika u <dialog>.
+  varijanta "rustik" (smještaj) dobiva tanki drveno-smeđi okvir oko fotografija.
+*/
+import { Picture, getImage } from 'astro:assets';
+import Ikona from './Ikona.astro';
+
+interface Props {
+  slike: { slika: ImageMetadata; alt: string }[];
+  varijanta?: 'svijetla' | 'tamna' | 'rustik';
+  id?: string;
+}
+
+const { slike, varijanta = 'svijetla', id = 'galerija' } = Astro.props;
+const velike = await Promise.all(slike.map((s) => getImage({ src: s.slika, width: 1600, format: 'webp' })));
+
+// Bento raspored (lg, 3 stupca): prva slika velika 2x2, dvije uz nju, ostatak u redovima po tri.
+// Ispod lg (2 stupca): prva preko cijele širine, ostale u parovima.
+// Zadnji red se uvijek razvuče, tako da nikad ne ostane prazna ćelija.
+const n = slike.length;
+const ostatakLg = Math.max(0, n - 3) % 3;
+const neparnoMob = (n - 1) % 2 === 1;
+const klasa = (i: number) => {
+  const k: string[] = [];
+  // mobitel / tablet
+  if (i === 0 || (neparnoMob && i === n - 1)) k.push('col-span-2 aspect-[16/10]');
+  else k.push('col-span-1 aspect-[4/3]');
+  // desktop
+  if (i === 0) k.push('lg:col-span-2 lg:row-span-2 lg:aspect-auto');
+  else if (i < 3) k.push('lg:col-span-1 lg:aspect-[4/3]');
+  else if (i >= n - ostatakLg && ostatakLg === 1) k.push('lg:col-span-3 lg:aspect-[21/9]');
+  else if (i >= n - ostatakLg && ostatakLg === 2 && i === n - 2) k.push('lg:col-span-2 lg:aspect-auto');
+  else k.push('lg:col-span-1 lg:aspect-[4/3]');
+  return k.join(' ');
+};
+// sizes prema istom rasporedu: ispod lg su parovi pola širine, pa preglednik ne vuče dvostruko veću sliku
+const velicine = (i: number) => {
+  const mobPuna = i === 0 || (neparnoMob && i === n - 1);
+  let lg = '33vw';
+  if (i === 0) lg = '66vw';
+  else if (i >= 3 && i >= n - ostatakLg && ostatakLg === 1) lg = '100vw';
+  else if (i >= 3 && i >= n - ostatakLg && ostatakLg === 2 && i === n - 2) lg = '66vw';
+  return `(min-width: 1024px) ${lg}, ${mobPuna ? '100vw' : '50vw'}`;
+};
+---
+
+<div class:list={['galerija grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3', `galerija-${varijanta}`]} id={id} data-reveal-grupa>
+  {
+    slike.map((s, i) => (
+      <button
+        type="button"
+        class:list={['group block w-full overflow-hidden text-left', klasa(i)]}
+        data-galerija-otvori={i}
+        data-velika={velike[i].src}
+        data-alt={s.alt}
+        aria-label={`Povećaj fotografiju: ${s.alt}`}
+        data-reveal
+      >
+        <Picture
+          src={s.slika}
+          alt={s.alt}
+          formats={['avif', 'webp']}
+          widths={[400, 640, 900]}
+          sizes={velicine(i)}
+          class="h-full w-full object-cover transition-transform duration-700 ease-out-soft group-hover:scale-[1.03]"
+        />
+      </button>
+    ))
+  }
+</div>
+
+<dialog class="pregled m-auto overscroll-contain max-h-none max-w-none bg-transparent p-0 backdrop:bg-podrum/90" data-galerija-dijalog={id} aria-label="Pregled fotografije">
+  <div class="flex h-dvh w-screen items-center justify-center p-4 md:p-12">
+    <img src={velike[0]?.src} alt={slike[0]?.alt} loading="lazy" class="max-h-full max-w-full object-contain" data-galerija-slika />
+    <button type="button" class="absolute right-3 top-3 inline-flex h-12 w-12 items-center justify-center bg-podrum/70 text-krem" aria-label="Zatvori pregled" data-galerija-zatvori>
+      <Ikona ime="x" velicina={26} />
+    </button>
+    <button type="button" class="absolute left-3 top-1/2 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center bg-podrum/70 text-krem" aria-label="Prethodna fotografija" data-galerija-prev>
+      <Ikona ime="caret-left" velicina={26} />
+    </button>
+    <button type="button" class="absolute right-3 top-1/2 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center bg-podrum/70 text-krem" aria-label="Sljedeća fotografija" data-galerija-next>
+      <Ikona ime="caret-right" velicina={26} />
+    </button>
+  </div>
+</dialog>
+
+<style>
+  .galerija-rustik button {
+    padding: 6px;
+    background: var(--color-pozadina);
+    border: 1px solid rgb(114 52 34 / 0.25);
+    box-shadow: 0 18px 40px -24px rgb(61 28 18 / 0.45);
+  }
+</style>
+
+<script>
+  import { animate } from 'motion';
+
+  document.querySelectorAll<HTMLElement>('.galerija').forEach((galerija) => {
+    const dijalog = document.querySelector<HTMLDialogElement>(`[data-galerija-dijalog="${galerija.id}"]`);
+    if (!dijalog) return;
+    const img = dijalog.querySelector<HTMLImageElement>('[data-galerija-slika]')!;
+    const gumbi = [...galerija.querySelectorAll<HTMLButtonElement>('[data-galerija-otvori]')];
+    let trenutna = 0;
+    let izvor: HTMLButtonElement | null = null;
+
+    const pokazi = (i: number) => {
+      trenutna = (i + gumbi.length) % gumbi.length;
+      img.src = gumbi[trenutna].dataset.velika!;
+      img.alt = gumbi[trenutna].dataset.alt!;
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        animate(img, { opacity: [0, 1], scale: [0.97, 1] }, { duration: 0.4, ease: [0.16, 1, 0.3, 1] });
+      }
+    };
+
+    gumbi.forEach((g, i) =>
+      g.addEventListener('click', () => {
+        izvor = g;
+        pokazi(i);
+        dijalog.showModal();
+      }),
+    );
+    dijalog.querySelector('[data-galerija-zatvori]')!.addEventListener('click', () => dijalog.close());
+    dijalog.querySelector('[data-galerija-prev]')!.addEventListener('click', () => pokazi(trenutna - 1));
+    dijalog.querySelector('[data-galerija-next]')!.addEventListener('click', () => pokazi(trenutna + 1));
+    dijalog.addEventListener('click', (e) => {
+      if (e.target === dijalog || (e.target as HTMLElement).matches('div')) dijalog.close();
+    });
+    dijalog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') pokazi(trenutna - 1);
+      if (e.key === 'ArrowRight') pokazi(trenutna + 1);
+    });
+    dijalog.addEventListener('close', () => izvor?.focus());
+  });
+</script>
