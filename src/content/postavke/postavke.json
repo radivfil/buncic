@@ -6,10 +6,21 @@
     "email": "info@buncic.hr",
     "telefon": "+385 1 2781-133",
     "mobitel": "+385 91 4450-654",
-    "adresa": "Šaškovečka 182, 10370 Dugo Selo",
-    "kartaUrl": "https://www.google.com/maps/search/?api=1&query=Klet+Bun%C4%8Di%C4%87+%C5%A0a%C5%A1kove%C4%8Dka+182+Dugo+Selo",
-    "facebook": "",
-    "instagram": "",
+    "adresa": "Šaškovečka ulica 182, 10370 Dugo Selo",
+    "drustveneMreze": [
+      {
+        "naziv": "Facebook",
+        "url": "https://www.facebook.com/obitelj.buncic",
+        "ikona": "facebook",
+        "oznaka": "Facebook – Obitelj Bunčić"
+      },
+      {
+        "naziv": "Instagram",
+        "url": "https://www.instagram.com/kletbuncic",
+        "ikona": "instagram",
+        "oznaka": "Instagram – Kletbuncic"
+      }
+    ],
     "tvrtka": {
       "naziv": "Ugostiteljski obrt Konoba Barba",
       "vlasnica": "Nevenka Bunčić",
@@ -20,29 +31,132 @@
     "lokacije": [
       {
         "naziv": "Klet obitelji Bunčić",
-        "adresa": "Šaškovečka 182, Dugo Selo",
-        "koordinate": [45.8186525, 16.2393532],
-        "telefoni": ["+385 1 2781-133", "+385 1 2781-132", "+385 91 4450-654"],
+        "oznaka": "klet",
+        "adresa": "Šaškovečka ulica 182, Dugo Selo",
+        "adresaKarta": "Šaškovečka ulica 182, 10370 Dugo Selo",
+        "kartaUrl": "https://www.google.com/maps/search/?api=1&query=Klet+Bun%C4%8Di%C4%87+%C5%A0a%C5%A1kove%C4%8Dka+182+Dugo+Selo",
+        "koordinate": [
+          45.8186525,
+          16.2393532
+        ],
+        "telefoni": [
+          "+385 1 2781-133",
+          "+385 1 2781-132",
+          "+385 91 4450-654"
+        ],
         "radnoVrijeme": [
-          "Nedjelja - četvrtak: 7 - 23 h",
-          "Petak i subota: 7 - 4 h",
-          "Tijekom svadbenih svečanosti: 7 - 6 h",
-          "Recepcija (sobe): 0 - 24 h"
+          {
+            "dani": "Ponedjeljak - nedjelja",
+            "vrijeme": "8-22h",
+            "shema": {
+              "dani": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+              ],
+              "od": "08:00",
+              "do": "22:00"
+            }
+          },
+          {
+            "dani": "Tijekom svadbenih svečanosti",
+            "vrijeme": "7 - 6 h"
+          },
+          {
+            "dani": "Recepcija (sobe)",
+            "vrijeme": "0 - 24 h"
+          }
         ]
       },
       {
         "naziv": "Ribarska koliba",
+        "oznaka": "ribarska",
         "adresa": "Rugvička ulica 217, Dugo Selo",
-        "koordinate": [45.7850724, 16.2364074],
-        "telefoni": ["+385 1 2753-393", "+385 91 4450-659"],
-        "radnoVrijeme": ["Ponedjeljak - subota: 7 - 22 h", "Nedjelja: 7 - 21 h"]
+        "adresaKarta": "Rugvička ulica 217, 10370 Dugo Selo",
+        "koordinate": [
+          45.7850724,
+          16.2364074
+        ],
+        "telefoni": [
+          "+385 1 2753-393",
+          "+385 91 4450-659"
+        ],
+        "radnoVrijeme": [
+          {
+            "dani": "Ponedjeljak - subota",
+            "vrijeme": "7 - 22 h",
+            "shema": {
+              "dani": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday"
+              ],
+              "od": "07:00",
+              "do": "22:00"
+            }
+          },
+          {
+            "dani": "Nedjelja",
+            "vrijeme": "7 - 21 h",
+            "shema": {
+              "dani": [
+                "Sunday"
+              ],
+              "od": "07:00",
+              "do": "21:00"
+            }
+          }
+        ]
       },
       {
         "naziv": "Uprava i računovodstvo",
+        "oznaka": "uprava",
         "adresa": "Josipa Zorića 59, 10370 Dugo Selo",
-        "telefoni": ["+385 1 2754-938"],
+        "telefoni": [
+          "+385 1 2754-938"
+        ],
         "email": "racunovodstvo@buncic.hr",
         "radnoVrijeme": []
+      },
+      {
+        "naziv": "Konoba Barba",
+        "oznaka": "barba",
+        "adresa": "Josipa Zorića 59, Dugo Selo",
+        "adresaKarta": "Josipa Zorića 59, 10370 Dugo Selo",
+        "telefoni": [
+          "+385 1 2753-947"
+        ],
+        "radnoVrijeme": [
+          {
+            "dani": "Ponedjeljak - subota",
+            "vrijeme": "06:00 - 23:00",
+            "shema": {
+              "dani": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday"
+              ],
+              "od": "06:00",
+              "do": "23:00"
+            }
+          },
+          {
+            "dani": "Nedjelja",
+            "vrijeme": "zatvoreno"
+          }
+        ],
+        "naKontaktu": false,
+        "napomena": "TODO: potvrditi s vlasnikom (telefon i radno vrijeme sa stare stranice buncic.hr, kontakt)"
       }
     ]
   }

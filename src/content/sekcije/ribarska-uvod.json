@@ -1,0 +1,26 @@
+{
+  "naslov": "Nadomak grada, u zagrljaju prirode",
+  "stavke": [
+    {
+      "ikona": "sun",
+      "naslov": "Uz jezero",
+      "opis": "Velika terasa"
+    },
+    {
+      "ikona": "fish",
+      "naslov": "Ribolov",
+      "opis": "Uz kupnju dnevne dozvole"
+    },
+    {
+      "ikona": "baby-carriage",
+      "naslov": "Za djecu",
+      "opis": "Ograđeno igralište"
+    },
+    {
+      "ikona": "users",
+      "naslov": "Svečanosti",
+      "opis": "do 80 osoba",
+      "oznaka": "Potvrditi kapacitet"
+    }
+  ]
+}

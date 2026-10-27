@@ -1,0 +1,21 @@
+{
+  "naslov": "Iz naše kuhinje",
+  "stavke": [
+    {
+      "naslov": "Juha „Klet Bunčić”",
+      "opis": "Juha od vrganja servirana u kalupu od kruha."
+    },
+    {
+      "naslov": "Juneći file „Sveti Martin”",
+      "opis": "Serviran na toplom kamenu, za stolom."
+    },
+    {
+      "naslov": "Sablja „Veseli lovac”",
+      "opis": "Ramstek, biftek i svinjski medaljon posluženi na sablji sa povrćem sa žara, seljačkim krumpirom i šampinjonima"
+    },
+    {
+      "naslov": "Tava „Klet Bunčić”",
+      "opis": "Tri vrste mesa s odabranim prilozima, poslužene u tavi."
+    }
+  ]
+}

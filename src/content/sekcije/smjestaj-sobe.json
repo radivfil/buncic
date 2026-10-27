@@ -1,0 +1,21 @@
+{
+  "naslov": "Noćenje u našoj Kleti",
+  "stavke": [
+    {
+      "naslov": "Jednokrevetne",
+      "opis": "1 osoba"
+    },
+    {
+      "naslov": "Dvokrevetne",
+      "opis": "2 osobe"
+    },
+    {
+      "naslov": "Trokrevetne",
+      "opis": "3 osobe"
+    },
+    {
+      "naslov": "Četverokrevetne",
+      "opis": "4 osobe"
+    }
+  ]
+}

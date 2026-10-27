@@ -1,33 +1,63 @@
 ---
 /*
   Potpisni modul "Koliko gostiju očekujete?".
-  Klizač i polje za broj su sinkronizirani; dvorane čiji raspon odgovara
-  ističu se, ostale se utišaju, a prva odgovarajuća se skrola u vidno polje.
+  Klizač i polje za broj su sinkronizirani; dvorane čiji maksimalni kapacitet
+  nije manji od broja gostiju ističu se, ostale se utišaju, a prva odgovarajuća se skrola u vidno polje.
   Vanilla JS (~1 kB), bez frameworka. Broj gostiju se čita i iz URL-a (?gosti=120)
   pa poveznica s početne stranice otvara već filtriran prikaz.
+
+  Klik na fotografiju dvorane otvara preglednik slika (sve fotografije iz niza
+  images te dvorane u dvorane.json). Nova fotografija = novi element u nizu, bez diranja koda.
+
+  Ista komponenta je na Vjenčanjima i na Proslavama (isti podaci iz dvorane.json):
+  - naslov / podnaslov: neobavezno, inače tekstovi iz stranice/vjencanja.json (odabir);
+  - klizac={false}: samo kartice s preglednikom, bez klizača "Koliko gostiju" (kartice rade i bez njega).
 */
-import { Picture } from 'astro:assets';
-import { getCollection } from 'astro:content';
+import { Picture, getImage } from 'astro:assets';
+import { getCollection, getEntry } from 'astro:content';
 import Ikona from './Ikona.astro';
 import DemoOznaka from './DemoOznaka.astro';
 
+interface Props {
+  naslov?: string;
+  podnaslov?: string;
+  klizac?: boolean;
+}
+const { klizac = true, ...tekstovi } = Astro.props;
+
 const dvorane = (await getCollection('dvorane')).sort((a, b) => a.data.redoslijed - b.data.redoslijed);
-const min = Math.min(...dvorane.map((d) => d.data.min));
-const max = Math.max(...dvorane.map((d) => d.data.max));
+// Dvorana odgovara ako je broj gostiju <= njezin maksimalni kapacitet; nema više donje granice po dvorani.
+// Gornja granica klizača = najveći kapacitet dvorane (za više gostiju vrijedi napomena o spajanju dvorana).
+const min = 10;
+const max = Math.max(...dvorane.map((d) => d.data.kapacitet));
 const pocetno = 120;
 const svePotvrdeno = dvorane.every((d) => d.data.potvrdeno);
+// Tekstovi modula: odabir u src/content/stranice/vjencanja.json
+const t = { ...(await getEntry('stranicaVjencanja', 'vjencanja'))!.data.odabir, ...tekstovi };
+
+// Velike verzije za preglednik (placeholderi bez src se preskaču)
+const slikePreglednika = await Promise.all(
+  dvorane.map((d) =>
+    Promise.all(
+      d.data.images
+        .filter((s) => s.src)
+        .map(async (s) => ({ src: (await getImage({ src: s.src!, width: 1600, format: 'webp' })).src, alt: s.alt })),
+    ),
+  ),
+);
 ---
 
 <section id="dvorane" class="odabir scroll-mt-24 py-24 lg:py-32" aria-labelledby="dvorane-naslov" data-odabir>
   <div class="okvir">
     <div class="grid gap-10 lg:grid-cols-12 lg:items-end">
       <div class="lg:col-span-6">
-        <h2 id="dvorane-naslov" class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Koliko gostiju očekujete?</h2>
+        <h2 id="dvorane-naslov" class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>{t.naslov}</h2>
         <p class="mt-5 max-w-[48ch] text-lg leading-relaxed text-tekst-meki" data-reveal>
-          Pomaknite klizač i pokazat ćemo vam dvoranu koja odgovara vašem slavlju.
-          <DemoOznaka potvrdeno={svePotvrdeno} tekst="Kapaciteti su primjer" class="ml-1 align-middle" />
+          {t.podnaslov}
+          <DemoOznaka potvrdeno={svePotvrdeno} tekst={t.oznakaPrimjer} class="ml-1 align-middle" />
         </p>
       </div>
+      {klizac && (
       <div class="lg:col-span-6" data-reveal>
         <div class="flex items-end justify-between gap-6">
           <label for="broj-gostiju" class="text-sm font-medium text-tekst-meki">Broj gostiju</label>
@@ -61,44 +91,62 @@ const svePotvrdeno = dvorane.every((d) => d.data.potvrdeno);
         </div>
         <p id="odabir-rezultat" class="mt-5 min-h-[3.5rem] text-lg text-tekst" role="status" aria-live="polite" data-rezultat></p>
       </div>
+      )}
     </div>
 
-    <ul class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-dvorane>
+    <p class="mt-14 text-lg leading-relaxed text-tekst-meki" data-reveal>{t.napomenaSpajanje}</p>
+
+    <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-dvorane>
       {
-        dvorane.map((d) => (
+        dvorane.map((d, i) => (
           <li
             class="dvorana relative flex flex-col bg-pozadina-2"
-            data-min={d.data.min}
-            data-max={d.data.max}
+            data-max={d.data.kapacitet}
             data-naziv={d.data.naziv}
             id={`dvorana-${d.id}`}
           >
-            <div class="aspect-[4/3] overflow-hidden">
-              <Picture
-                src={d.data.slika}
-                alt={d.data.alt}
-                formats={['avif', 'webp']}
-                widths={[400, 640, 900]}
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                class="h-full w-full object-cover"
-              />
-            </div>
+            {d.data.images[0].src ? (
+              <button
+                type="button"
+                class="group block aspect-[4/3] w-full overflow-hidden"
+                aria-label={`Otvori fotografije: ${d.data.naziv} (${slikePreglednika[i].length})`}
+                aria-haspopup="dialog"
+                data-preglednik-otvori
+                data-naziv={d.data.naziv}
+                data-slike={JSON.stringify(slikePreglednika[i])}
+              >
+                <Picture
+                  src={d.data.images[0].src}
+                  alt={d.data.images[0].alt}
+                  formats={['avif', 'webp']}
+                  widths={[400, 640, 900]}
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  class="h-full w-full object-cover transition-transform duration-700 ease-out-soft group-hover:scale-[1.03]"
+                />
+              </button>
+            ) : (
+              /* TODO-slika: placeholder po obrascu projekta (isprekidani okvir, kao "Fotografije soba") */
+              <div class="flex aspect-[4/3] flex-col items-center justify-center gap-3 border border-dashed border-rub/30">
+                <Ikona ime="camera-plus" velicina={36} class="text-naglasak" />
+                <DemoOznaka tekst="TODO-slika" />
+              </div>
+            )}
             <div class="flex flex-1 flex-col p-5">
               <p class="oznaka-preporuka hidden items-center gap-1.5 text-sm font-medium text-naglasak">
                 <Ikona ime="check-circle" velicina={18} /> Odgovara vašem broju gostiju
               </p>
               <h3 class="mt-1 font-display text-2xl leading-tight">{d.data.naziv}</h3>
-              <p class="mt-2 text-sm leading-relaxed text-tekst-meki">{d.data.opis}</p>
-              <dl class="mt-auto grid grid-cols-2 gap-3 border-t border-rub/15 pt-4 text-sm">
-                <div>
-                  <dt class="text-tekst-meki">Kapacitet</dt>
-                  <dd class="font-display text-xl tabular-nums">{d.data.min} - {d.data.max}</dd>
-                </div>
-                <div>
-                  <dt class="text-tekst-meki">{d.data.konfiguracije[0].tip}</dt>
-                  <dd class="font-display text-xl tabular-nums">do {d.data.konfiguracije[0].gosti}</dd>
-                </div>
-              </dl>
+              <p class="mt-2 flex-grow text-sm leading-relaxed text-tekst-meki">{d.data.opis}</p>
+              <div class="mt-6 border-t border-rub/15 pt-4 text-sm">
+                {d.data.oznakaKapaciteta ? (
+                  <dl>
+                    <dt class="text-tekst-meki">{d.data.oznakaKapaciteta}</dt>
+                    <dd class="font-display text-xl tabular-nums">do {d.data.kapacitet} osoba</dd>
+                  </dl>
+                ) : (
+                  <p class="font-display text-xl tabular-nums">do {d.data.kapacitet} osoba</p>
+                )}
+              </div>
             </div>
           </li>
         ))
@@ -106,6 +154,35 @@ const svePotvrdeno = dvorane.every((d) => d.data.potvrdeno);
     </ul>
   </div>
 </section>
+
+<!-- Preglednik slika dvorana (lightbox). Native <dialog> + showModal: pozadina je inertna, Esc zatvara. -->
+<dialog
+  class="preglednik m-auto max-h-none max-w-none overscroll-contain bg-transparent p-0 text-krem backdrop:bg-podrum/90"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="preglednik-naslov"
+  data-preglednik
+>
+  <div class="relative flex h-dvh w-screen flex-col items-center justify-center px-4 pb-6 pt-20 md:px-20 md:pb-10" data-preglednik-pozadina>
+    <figure class="flex max-h-full min-h-0 max-w-full flex-col items-center">
+      <!-- src i alt postavlja skripta pri otvaranju (lijeno učitavanje) -->
+      <img alt="" loading="lazy" decoding="async" class="max-h-[calc(100dvh-9rem)] min-h-0 max-w-full object-contain" data-preglednik-slika />
+      <figcaption class="mt-4 flex items-baseline gap-4 text-sm">
+        <span id="preglednik-naslov" class="font-display text-xl" data-preglednik-naziv></span>
+        <span class="tabular-nums text-krem/80" aria-live="polite" data-preglednik-brojac></span>
+      </figcaption>
+    </figure>
+    <button type="button" class="absolute right-3 top-3 inline-flex h-12 w-12 items-center justify-center bg-podrum/70 text-krem" aria-label="Zatvori pregled" data-preglednik-zatvori>
+      <Ikona ime="x" velicina={26} />
+    </button>
+    <button type="button" class="absolute left-3 top-1/2 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center bg-podrum/70 text-krem" aria-label="Prethodna fotografija" data-preglednik-prev>
+      <Ikona ime="caret-left" velicina={26} />
+    </button>
+    <button type="button" class="absolute right-3 top-1/2 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center bg-podrum/70 text-krem" aria-label="Sljedeća fotografija" data-preglednik-next>
+      <Ikona ime="caret-right" velicina={26} />
+    </button>
+  </div>
+</dialog>
 
 <style>
   .dvorana {
@@ -166,8 +243,99 @@ const svePotvrdeno = dvorane.every((d) => d.data.potvrdeno);
 </style>
 
 <script>
+  import { animate } from 'motion';
+
+  // Preglednik slika dvorana
+  const preglednik = document.querySelector<HTMLDialogElement>('[data-preglednik]');
+  if (preglednik) {
+    const img = preglednik.querySelector<HTMLImageElement>('[data-preglednik-slika]')!;
+    const naziv = preglednik.querySelector<HTMLElement>('[data-preglednik-naziv]')!;
+    const brojac = preglednik.querySelector<HTMLElement>('[data-preglednik-brojac]')!;
+    const zatvori = preglednik.querySelector<HTMLButtonElement>('[data-preglednik-zatvori]')!;
+    const prev = preglednik.querySelector<HTMLButtonElement>('[data-preglednik-prev]')!;
+    const next = preglednik.querySelector<HTMLButtonElement>('[data-preglednik-next]')!;
+    const smanjenoKretanje = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let slike: { src: string; alt: string }[] = [];
+    let trenutna = 0;
+    let izvor: HTMLElement | null = null;
+
+    // Susjedne slike se dohvaćaju unaprijed da listanje bude trenutno
+    const preducitaj = (i: number) => {
+      if (slike.length < 2) return;
+      new Image().src = slike[(i + slike.length) % slike.length].src;
+    };
+    const pokazi = (i: number) => {
+      trenutna = (i + slike.length) % slike.length;
+      img.src = slike[trenutna].src;
+      img.alt = slike[trenutna].alt;
+      brojac.textContent = `${trenutna + 1} / ${slike.length}`;
+      preducitaj(trenutna + 1);
+      preducitaj(trenutna - 1);
+      if (!smanjenoKretanje()) {
+        animate(img, { opacity: [0, 1], scale: [0.97, 1] }, { duration: 0.4, ease: [0.16, 1, 0.3, 1] });
+      }
+    };
+    const otvori = (gumb: HTMLElement) => {
+      slike = JSON.parse(gumb.dataset.slike || '[]');
+      if (!slike.length) return;
+      izvor = gumb;
+      naziv.textContent = gumb.dataset.naziv || '';
+      prev.hidden = next.hidden = slike.length < 2;
+      pokazi(0);
+      document.documentElement.style.overflow = 'hidden';
+      preglednik.showModal();
+      zatvori.focus();
+    };
+
+    document.querySelectorAll<HTMLElement>('[data-preglednik-otvori]').forEach((g) => g.addEventListener('click', () => otvori(g)));
+    zatvori.addEventListener('click', () => preglednik.close());
+    prev.addEventListener('click', () => pokazi(trenutna - 1));
+    next.addEventListener('click', () => pokazi(trenutna + 1));
+    // Klik izvan slike (na tamnu pozadinu) zatvara
+    preglednik.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      if (t === preglednik || t.hasAttribute('data-preglednik-pozadina') || t.tagName === 'FIGURE') preglednik.close();
+    });
+    preglednik.addEventListener('keydown', (e) => {
+      if (slike.length > 1 && e.key === 'ArrowLeft') pokazi(trenutna - 1);
+      if (slike.length > 1 && e.key === 'ArrowRight') pokazi(trenutna + 1);
+      // Fokus ostaje zarobljen unutar preglednika
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const fokusabilni = [zatvori, prev, next].filter((b) => !b.hidden);
+        const i = fokusabilni.indexOf(document.activeElement as HTMLButtonElement);
+        fokusabilni[(i + (e.shiftKey ? -1 : 1) + fokusabilni.length) % fokusabilni.length].focus();
+      }
+    });
+    // Swipe lijevo / desno na dodirnim zaslonima
+    let dodirX: number | null = null;
+    let dodirY = 0;
+    preglednik.addEventListener(
+      'touchstart',
+      (e) => {
+        dodirX = e.touches[0].clientX;
+        dodirY = e.touches[0].clientY;
+      },
+      { passive: true },
+    );
+    preglednik.addEventListener('touchend', (e) => {
+      if (dodirX === null || slike.length < 2) return;
+      const dx = e.changedTouches[0].clientX - dodirX;
+      const dy = e.changedTouches[0].clientY - dodirY;
+      dodirX = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) pokazi(trenutna + (dx < 0 ? 1 : -1));
+    });
+    // Esc (native cancel), gumb X i klik izvan slike završavaju ovdje
+    preglednik.addEventListener('close', () => {
+      document.documentElement.style.overflow = '';
+      img.removeAttribute('src');
+      izvor?.focus();
+    });
+  }
+
   const odabir = document.querySelector<HTMLElement>('[data-odabir]');
-  if (odabir) {
+  // Bez klizača (klizac={false}) kartice ostaju statične, preglednik slika radi i dalje
+  if (odabir?.querySelector('[data-klizac]')) {
     const klizac = odabir.querySelector<HTMLInputElement>('[data-klizac]')!;
     const broj = odabir.querySelector<HTMLInputElement>('[data-broj]')!;
     const rezultat = odabir.querySelector<HTMLElement>('[data-rezultat]')!;
@@ -178,7 +346,7 @@ const svePotvrdeno = dvorane.every((d) => d.data.potvrdeno);
 
     const primijeni = (n: number, skrolaj: boolean) => {
       const gosti = Math.min(max, Math.max(min, Math.round(n) || min));
-      const odgovaraju = dvorane.filter((d) => gosti >= Number(d.dataset.min) && gosti <= Number(d.dataset.max));
+      const odgovaraju = dvorane.filter((d) => gosti <= Number(d.dataset.max));
       dvorane.forEach((d) => (d.dataset.stanje = odgovaraju.includes(d) ? 'da' : 'ne'));
       const nazivi = odgovaraju.map((d) => d.dataset.naziv);
       rezultat.textContent = nazivi.length

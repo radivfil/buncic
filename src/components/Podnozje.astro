@@ -1,17 +1,29 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
+import { getEntry } from 'astro:content';
+import { navigacija } from '../lib/navigacija';
 import Ikona from './Ikona.astro';
+import RedakRadnogVremena from './RedakRadnogVremena.astro';
+import DrustveneMreze from './DrustveneMreze.astro';
+import { kartaAria, kartaHref, telHref } from '../lib/kontakt';
+import Telefon from './Telefon.astro';
 
 const postavke = (await getEntry('postavke', 'opce'))!.data;
-const ponuda = (await getCollection('ponuda')).sort((a, b) => a.data.redoslijed - b.data.redoslijed);
+const nav = await navigacija();
+// Dva stupca puna odozgo prema dolje (grid-flow-col, broj redaka = pola stavki zaokruženo naviše): 7 = 4 + 3.
+// Jedan stupac na sm (uski stupac podnožja) i od lg naviše.
+const stupciStranica =
+  'grid grid-cols-1 gap-x-6 gap-y-2 xs:grid-flow-col xs:grid-cols-2 xs:[grid-template-rows:repeat(var(--redovi),auto)] sm:grid-flow-row sm:grid-cols-1 sm:[grid-template-rows:none] md:grid-flow-col md:grid-cols-2 md:[grid-template-rows:repeat(var(--redovi),auto)] lg:grid-flow-row lg:grid-cols-1 lg:[grid-template-rows:none]';
+const redovi = (n: number) => `--redovi:${Math.ceil(n / 2)}`;
 const [klet, koliba, uprava] = postavke.lokacije;
-const tel = (broj: string) => `tel:${broj.replace(/[^\d+]/g, '')}`;
+const barba = postavke.lokacije.find((l) => l.naziv === 'Konoba Barba')!;
 const godina = new Date().getFullYear();
 ---
 
 <footer class="na-tamnom relative bg-podrum text-krem/80">
-  <div class="okvir grid gap-12 py-16 md:grid-cols-12 md:gap-8 lg:py-24">
-    <div class="md:col-span-12 lg:col-span-4">
+  <!-- Mreža: 1 stupac; sm 2 stupca; lg blok s logom preko cijelog reda + 4 stupca po sadržaju; xl svih 5 u jednom redu.
+       Stupci lokacija su "auto" pa se radno vrijeme (nowrap) nikad ne reže. -->
+  <div class="okvir grid gap-12 pb-4 pt-16 sm:grid-cols-2 sm:gap-x-8 min-[769px]:pb-16 lg:grid-cols-[repeat(4,auto)] lg:justify-between lg:gap-x-10 lg:py-24 xl:grid-cols-[minmax(14rem,1fr)_repeat(4,auto)] xl:grid-rows-[auto_1fr]">
+    <div class="sm:col-span-2 lg:col-span-4 xl:col-span-1">
       <a href="/" class="inline-flex items-center gap-4" aria-label="Obitelj Bunčić, početna stranica">
         <img src="/logo.svg" alt="" width="70" height="80" class="h-20 w-auto" loading="lazy" />
         <span class="font-display text-2xl leading-tight text-krem" translate="no">Obitelj Bunčić</span>
@@ -22,57 +34,86 @@ const godina = new Date().getFullYear();
       <a href="/kontakt" class="gumb-svijetli mt-8">Pošaljite upit</a>
     </div>
 
-    <div class="md:col-span-4 lg:col-span-3">
+    <!-- Društvene mreže (jedna instanca, raspored samo CSS-om):
+         do 768 px zadnja u mreži (order), centrirano, 1 rem iznad crte s podacima o obrtu;
+         od 769 px u redu odmah ispod gumba "Pošaljite upit" (−2 rem poništava razmak redaka od 3 rem),
+         na xl u prvom stupcu dok ostali stupci zauzimaju oba retka. -->
+    <DrustveneMreze class="order-1 col-span-full justify-center min-[769px]:order-none min-[769px]:row-start-2 min-[769px]:-mt-8 min-[769px]:justify-start xl:col-span-1 xl:col-start-1 xl:self-start" />
+
+    <div class="xl:row-span-2">
       <h2 class="font-display text-xl text-krem">{klet.naziv}</h2>
       <address class="mt-4 space-y-2 not-italic">
-        <a href={postavke.kartaUrl} class="flex gap-3 hover:text-krem" rel="noopener" target="_blank">
-          <Ikona ime="map-pin" velicina={20} class="mt-0.5 shrink-0 text-zlato" />
+        <a href={kartaHref(klet)} target="_blank" rel="noopener noreferrer" aria-label={kartaAria(klet)} class="flex min-h-11 items-center gap-3 hover:text-krem md:min-h-0 md:items-start">
+          <Ikona ime="map-pin" velicina={20} class="shrink-0 text-zlato md:mt-0.5" />
           {klet.adresa}
         </a>
         {
           klet.telefoni.slice(0, 2).map((t) => (
-            <a href={tel(t)} class="flex gap-3 hover:text-krem">
-              <Ikona ime="phone" velicina={20} class="mt-0.5 shrink-0 text-zlato" />
-              {t}
+            <a href={telHref(t)} class="flex min-h-11 items-center gap-3 hover:text-krem md:min-h-0">
+              <Ikona ime="phone" velicina={20} class="shrink-0 text-zlato" />
+              <Telefon broj={t} />
             </a>
           ))
         }
-        <a href={`mailto:${postavke.email}`} class="flex gap-3 hover:text-krem">
-          <Ikona ime="envelope-simple" velicina={20} class="mt-0.5 shrink-0 text-zlato" />
+        <a href={`mailto:${postavke.email}`} class="flex min-h-11 items-center gap-3 hover:text-krem md:min-h-0">
+          <Ikona ime="envelope-simple" velicina={20} class="shrink-0 text-zlato" />
           {postavke.email}
         </a>
       </address>
       <ul class="mt-5 space-y-1 text-sm">
-        {klet.radnoVrijeme.map((r) => <li>{r}</li>)}
+        {klet.radnoVrijeme.map((r) => <li><RedakRadnogVremena r={r} /></li>)}
       </ul>
     </div>
 
-    <div class="md:col-span-4 lg:col-span-2">
+    <div class="xl:row-span-2">
       <h2 class="font-display text-xl text-krem">{koliba.naziv}</h2>
       <address class="mt-4 space-y-2 not-italic">
-        <p class="flex gap-3">
-          <Ikona ime="map-pin" velicina={20} class="mt-0.5 shrink-0 text-zlato" />
+        <a href={kartaHref(koliba)} target="_blank" rel="noopener noreferrer" aria-label={kartaAria(koliba)} class="flex min-h-11 items-center gap-3 hover:text-krem md:min-h-0 md:items-start">
+          <Ikona ime="map-pin" velicina={20} class="shrink-0 text-zlato md:mt-0.5" />
           {koliba.adresa}
-        </p>
+        </a>
         {
           koliba.telefoni.map((t) => (
-            <a href={tel(t)} class="flex gap-3 hover:text-krem">
-              <Ikona ime="phone" velicina={20} class="mt-0.5 shrink-0 text-zlato" />
-              {t}
+            <a href={telHref(t)} class="flex min-h-11 items-center gap-3 hover:text-krem md:min-h-0">
+              <Ikona ime="phone" velicina={20} class="shrink-0 text-zlato" />
+              <Telefon broj={t} />
             </a>
           ))
         }
       </address>
       <ul class="mt-5 space-y-1 text-sm">
-        {koliba.radnoVrijeme.map((r) => <li>{r}</li>)}
+        {koliba.radnoVrijeme.map((r) => <li><RedakRadnogVremena r={r} /></li>)}
       </ul>
     </div>
 
-    <nav aria-label="Poveznice u podnožju" class="md:col-span-4 lg:col-span-3">
-      <h2 class="font-display text-xl text-krem">Stranice</h2>
-      <ul class="mt-4 grid grid-cols-1 gap-y-2 xs:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 lg:gap-x-6">
+    <div class="xl:row-span-2">
+      <h2 class="font-display text-xl text-krem">{barba.naziv}</h2>
+      <address class="mt-4 space-y-2 not-italic">
+        <a href={kartaHref(barba)} target="_blank" rel="noopener noreferrer" aria-label={kartaAria(barba)} class="flex min-h-11 items-center gap-3 hover:text-krem md:min-h-0 md:items-start">
+          <Ikona ime="map-pin" velicina={20} class="shrink-0 text-zlato md:mt-0.5" />
+          {barba.adresa}
+        </a>
         {
-          ponuda.map((p) => (
+          barba.telefoni.map((t) => (
+            <a href={telHref(t)} class="flex min-h-11 items-center gap-3 hover:text-krem md:min-h-0">
+              <Ikona ime="phone" velicina={20} class="shrink-0 text-zlato" />
+              <Telefon broj={t} />
+            </a>
+          ))
+        }
+      </address>
+      <!-- TODO: potvrditi s vlasnikom (podaci Konobe Barba sa stare stranice buncic.hr) -->
+      <ul class="mt-5 space-y-1 text-sm">
+        {barba.radnoVrijeme.map((r) => <li><RedakRadnogVremena r={r} /></li>)}
+      </ul>
+    </div>
+
+    <nav aria-label="Poveznice u podnožju" class="xl:row-span-2">
+      <h2 class="font-display text-xl text-krem">Stranice</h2>
+      <!-- Stupci se pune odozgo prema dolje pa slijeva nadesno: 7 stranica = 4 + 3 -->
+      <ul class:list={['mt-4', stupciStranica]} style={redovi(nav.stranice.length)}>
+        {
+          nav.stranice.map((p) => (
             <li>
               <a href={`/ponuda/${p.id}`} class="hover:text-krem">
                 {p.data.nazivIzbornik}
@@ -80,8 +121,15 @@ const godina = new Date().getFullYear();
             </li>
           ))
         }
-        <li><a href="/novosti" class="hover:text-krem">Novosti i događanja</a></li>
-        <li><a href="/kontakt" class="hover:text-krem">Kontakt</a></li>
+      </ul>
+      <ul class:list={['mt-2', stupciStranica]} style={redovi(nav.podnozjeDodatno.length)}>
+        {
+          nav.podnozjeDodatno.map((l) => (
+            <li>
+              <a href={l.href} class="hover:text-krem">{l.tekst}</a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
   </div>

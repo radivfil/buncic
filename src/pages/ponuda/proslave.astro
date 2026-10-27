@@ -1,24 +1,22 @@
 ---
 import { Picture } from 'astro:assets';
-import { getEntry, render } from 'astro:content';
+import { getEntry } from 'astro:content';
 import Osnovni from '../../layouts/Osnovni.astro';
 import Ikona from '../../components/Ikona.astro';
-import Galerija from '../../components/Galerija.astro';
+import OdabirDvorane from '../../components/OdabirDvorane.astro';
 import SekcijaUpit from '../../components/SekcijaUpit.astro';
-import FotoTraka from '../../components/FotoTraka.astro';
-// ZAMIJENITI PRIJE LAUNCHA: arhivska fotografija (mobitel)
-import kuca from '../../assets/images/imanje/stara-drvena-kuca.jpg';
+import GumbDokument from '../../components/GumbDokument.astro';
+import VinskiBlagdani from '../../components/VinskiBlagdani.astro';
+import { dokumentiStranice } from '../../lib/dokumenti';
 
 const unos = (await getEntry('ponuda', 'proslave'))!;
-const { Content } = await render(unos);
 const d = unos.data;
 
-const prigode = [
-  { naziv: 'Krštenja', ikona: 'baby', opis: 'Obiteljski ručak nakon obreda, u mirnoj dvorani ili na terasi.' },
-  { naziv: 'Pričesti i krizme', ikona: 'church', opis: 'Svečani meniji za veća društva, s tortom po želji.' },
-  { naziv: 'Rođendani i obljetnice', ikona: 'cake', opis: 'Od okruglih rođendana do zlatnih pira.' },
-  { naziv: 'Domjenci i poslovni događaji', ikona: 'users-three', opis: 'Božićni domjenci, proslave tvrtki i poslovni ručkovi.' },
-];
+// Prigode: src/content/sekcije/proslave-prigode.json; uvod dvorana: proslave-dvorane.json
+const prigode = (await getEntry('sekcije', 'proslave-prigode'))!.data;
+const dvorane = (await getEntry('sekcije', 'proslave-dvorane'))!.data;
+// Jelovnici za preuzimanje: src/content/dokumenti/dokumenti.json (stranica: proslave)
+const dokumenti = await dokumentiStranice('proslave');
 ---
 
 <Osnovni naslov={d.seoNaslov} opis={d.seoOpis} slika={d.naslovnica}>
@@ -29,7 +27,10 @@ const prigode = [
         Proslave i <em class="italic text-naglasak">svečanosti</em>
       </h1>
       <p class="mt-6 max-w-[56ch] text-lg leading-relaxed text-tekst-meki">{d.uvod}</p>
-      <a href="#upit" class="gumb-primarni mt-8">Pošaljite upit</a>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="#upit" class="gumb-primarni">Pošaljite upit</a>
+        {dokumenti.map((dok) => <GumbDokument dokument={dok} />)}
+      </div>
     </div>
   </section>
   <div class="okvir" data-hero-slika>
@@ -38,7 +39,7 @@ const prigode = [
         src={d.naslovnica!}
         alt={d.naslovnicaAlt!}
         formats={['avif', 'webp']}
-        widths={[640, 1000, 1500]}
+        widths={[640, 1000, 1500, 2480]}
         sizes="(min-width: 1320px) 1240px, 100vw"
         loading="eager"
         fetchpriority="high"
@@ -49,16 +50,16 @@ const prigode = [
 
   <!-- PRIGODE: popis u dva stupca s ikonama -->
   <section class="okvir py-24 lg:py-32">
-    <h2 class="max-w-[20ch] text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Za svaku prigodu, prijedlog menija</h2>
+    <h2 class="max-w-[20ch] text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>{prigode.naslov}</h2>
     <ul class="mt-14 grid gap-x-16 gap-y-12 md:grid-cols-2" data-reveal-grupa>
       {
-        prigode.map((p) => (
+        prigode.stavke.map((p) => (
           <li class="flex gap-6" data-reveal>
             <span class="flex h-16 w-16 shrink-0 items-center justify-center bg-pozadina-2 text-naglasak">
-              <Ikona ime={p.ikona} velicina={32} />
+              <Ikona ime={p.ikona!} velicina={32} />
             </span>
             <div>
-              <h3 class="font-display text-2xl md:text-3xl">{p.naziv}</h3>
+              <h3 class="font-display text-2xl md:text-3xl">{p.naslov}</h3>
               <p class="mt-2 max-w-[40ch] leading-relaxed text-tekst-meki">{p.opis}</p>
             </div>
           </li>
@@ -67,26 +68,11 @@ const prigode = [
     </ul>
   </section>
 
-  <!-- VINSKI BLAGDANI: fotografija preko cijele širine (stara drvena kuća na imanju) -->
-  <FotoTraka slika={kuca} alt="Stara drvena kuća od greda na imanju" poravnanje="lijevo" pozicija="object-[60%_50%]">
-    <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl">
-      Berba, Vincekovo, Martinje. <em class="italic text-zlato">Slavimo i mi.</em>
-    </h2>
-    <div class="proza mt-6 text-lg leading-relaxed text-krem/85">
-      <Content />
-      <p>Dođite i proveselite se s nama.</p>
-    </div>
-  </FotoTraka>
+  <!-- Ljubav, žene i vino: vraćeno s Izleta u prirodi na prvotno mjesto (faza 1d) -->
+  <VinskiBlagdani />
 
-  <section class="okvir py-24 lg:py-32" aria-labelledby="dvorane-naslov">
-    <h2 id="dvorane-naslov" class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Naše dvorane</h2>
-    <p class="mt-5 max-w-[52ch] text-lg leading-relaxed text-tekst-meki" data-reveal>
-      Nekoliko dvorana različitih veličina, pa i manja obiteljska proslava i veliko slavlje dobiju prostor po mjeri.
-    </p>
-    <div class="mt-12">
-      <Galerija slike={d.galerija} id="galerija-proslave" />
-    </div>
-  </section>
+  <!-- DVORANE: ista komponenta i isti podaci kao na Vjenčanjima (dvorane.json); klizač se isključuje u proslave-dvorane.json -->
+  <OdabirDvorane naslov={dvorane.naslov} podnaslov={dvorane.odlomci[0]} klizac={dvorane.prikaziKlizacGostiju ?? false} />
 
   <SekcijaUpit
     naslov="Recite nam što slavite"

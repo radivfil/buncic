@@ -1,13 +1,17 @@
 ---
 /*
   Tri zasebna obrasca za upite:
-  - "dogadjaj"  vjenčanja i proslave (ime, kontakt, datum, broj gostiju, lokacija, napomena)
+  - "dogadjaj"  vjenčanja i proslave (ime, e-mail, mobitel, datum, broj gostiju, lokacija, napomena)
   - "smjestaj"  dolazak, odlazak, broj osoba, broj soba
-  - "opci"      ime, kontakt, poruka
+  - "opci"      ime, e-mail, mobitel, poruka
+  E-mail i broj mobitela su dva zasebna obavezna polja (name="email" i name="mobitel").
   DEMO: slanje se simulira. Za produkciju postaviti action na Cloudflare Pages
   Function (npr. functions/api/upit.ts) ili servis poput Formspree / Web3Forms.
 */
+import { getEntry } from 'astro:content';
 import Ikona from './Ikona.astro';
+import Telefon from './Telefon.astro';
+import { telHref } from '../lib/kontakt';
 
 interface Props {
   vrsta: 'dogadjaj' | 'smjestaj' | 'opci';
@@ -19,8 +23,10 @@ interface Props {
 
 const { vrsta, id = `obrazac-${vrsta}`, prigoda, tamno = false } = Astro.props;
 const prigode = ['Vjenčanje', 'Krštenje', 'Pričest ili krizma', 'Rođendan', 'Domjenak ili poslovni događaj', 'Catering na vašoj lokaciji', 'Drugo'];
-const lokacije = ['Klet obitelji Bunčić, Šaškovečka 182', 'Ribarska koliba, Rugvička 217', 'Catering na mojoj lokaciji', 'Još ne znam'];
+const lokacije = ['Klet obitelji Bunčić, Šaškovečka ulica 182', 'Ribarska koliba, Rugvička 217', 'Catering na mojoj lokaciji', 'Još ne znam'];
 const f = (ime: string) => `${id}-${ime}`;
+// Broj za hitne upite: glavni broj Kleti iz postavke.json
+const telefon = (await getEntry('postavke', 'opce'))!.data.lokacije[0].telefoni[0];
 ---
 
 <form
@@ -33,27 +39,42 @@ const f = (ime: string) => `${id}-${ime}`;
 >
   <input type="hidden" name="vrsta-upita" value={vrsta} />
   <div class="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2">
-    <div class="polje">
+    <div class="polje md:col-span-2">
       <label for={f('ime')}>Ime i prezime</label>
       <input id={f('ime')} name="ime" type="text" autocomplete="name" required aria-describedby={f('ime-greska')} />
       <p class="greska" id={f('ime-greska')}>Upišite ime i prezime.</p>
     </div>
 
     <div class="polje">
-      <label for={f('kontakt')}>E-mail ili telefon</label>
+      <label for={f('email')}>E-mail</label>
       <input
-        id={f('kontakt')}
-        name="kontakt"
-        type="text"
+        id={f('email')}
+        name="email"
+        type="email"
         autocomplete="email"
         inputmode="email"
         spellcheck="false"
         required
-        data-provjera="kontakt"
-        aria-describedby={`${f('kontakt-pomoc')} ${f('kontakt-greska')}`}
+        data-provjera="email"
+        aria-describedby={`${f('email-pomoc')} ${f('email-greska')}`}
       />
-      <p class="pomoc" id={f('kontakt-pomoc')}>Javit ćemo se unutar jednog radnog dana.</p>
-      <p class="greska" id={f('kontakt-greska')}>Upišite ispravan e-mail ili broj telefona.</p>
+      <p class="pomoc" id={f('email-pomoc')}>Javit ćemo se unutar jednog radnog dana.</p>
+      <p class="greska" id={f('email-greska')}>Upišite ispravnu e-mail adresu.</p>
+    </div>
+
+    <div class="polje">
+      <label for={f('mobitel')}>Broj mobitela</label>
+      <input
+        id={f('mobitel')}
+        name="mobitel"
+        type="tel"
+        autocomplete="tel"
+        inputmode="tel"
+        required
+        data-provjera="mobitel"
+        aria-describedby={f('mobitel-greska')}
+      />
+      <p class="greska" id={f('mobitel-greska')}>Upišite ispravan broj mobitela.</p>
     </div>
 
     {
@@ -151,7 +172,7 @@ const f = (ime: string) => `${id}-${ime}`;
   <div class="uspjeh absolute inset-0 hidden flex-col items-start justify-center gap-4 p-2" data-uspjeh tabindex="-1">
     <Ikona ime="check-circle" velicina={44} class="text-naglasak" />
     <p class="font-display text-3xl">Hvala, upit je zaprimljen.</p>
-    <p class="max-w-[48ch] opacity-85">Javit ćemo vam se unutar jednog radnog dana. Za hitne upite nazovite 01 2781-133.</p>
+    <p class="max-w-[48ch] opacity-85">Javit ćemo vam se unutar jednog radnog dana. Za hitne upite nazovite <a href={telHref(telefon)} class="underline underline-offset-4"><Telefon broj={telefon} /></a>.</p>
     <button type="button" class="poveznica mt-2" data-novi-upit>Pošaljite novi upit</button>
   </div>
 </form>
@@ -215,9 +236,8 @@ const f = (ime: string) => `${id}-${ime}`;
       let ok = polje.checkValidity();
       const v = polje.value.trim();
       const tip = polje.dataset.provjera;
-      if (ok && tip === 'kontakt') {
-        ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || /^\+?[\d\s/-]{6,}$/.test(v);
-      }
+      if (ok && tip === 'email') ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      if (ok && tip === 'mobitel') ok = /^\+?[\d\s/-]{6,}$/.test(v);
       if (ok && tip === 'buduci') ok = v >= danas;
       if (ok && tip === 'nakon-dolaska') {
         const dolazak = forma.querySelector<HTMLInputElement>('[name="dolazak"]')?.value;

@@ -1,0 +1,78 @@
+[
+  {
+    "id": "zadana-og",
+    "stranica": "sve stranice bez vlastite naslovnice",
+    "mjesto": "Zadana slika za dijeljenje na društvenim mrežama (Open Graph, 1200 × 630)",
+    "slika": "../../assets/images/pocetna/hero-mladenci-sjenica.jpg",
+    "alt": "Mladenci u zagrljaju ispred drvene sjenice, iza njih vinograd Martin brega"
+  },
+  {
+    "id": "pocetna-hero",
+    "stranica": "Početna",
+    "mjesto": "Hero, fotografija preko cijelog ekrana",
+    "slika": "../../assets/images/pocetna/hero-mladenci-sjenica.jpg",
+    "alt": "Mladenci u zagrljaju ispred drvene sjenice, iza njih vinograd Martin brega",
+    "napomena": "ZAMIJENITI PRIJE LAUNCHA: snimka mobitelom, samo 960 px (vidi FOTOGRAFIJE.md)"
+  },
+  {
+    "id": "pocetna-zgrada",
+    "stranica": "Početna",
+    "mjesto": "Uvod \"Dobro došli\", velika fotografija u luku",
+    "slika": "../../assets/images/pocetna/klet-zgrada.jpg",
+    "alt": "Pročelje Kleti obitelji Bunčić od crvene opeke s drvenim balkonima",
+    "napomena": "ZAMIJENITI PRIJE LAUNCHA: snimka mobitelom"
+  },
+  {
+    "id": "pocetna-park",
+    "stranica": "Početna",
+    "mjesto": "Uvod \"Dobro došli\", mala kvadratna fotografija preko luka",
+    "slika": "../../assets/images/imanje/bunar-sjenica.jpg",
+    "alt": "Drvena sjenica s bunarom i cvijećem ispred Kleti",
+    "napomena": "ZAMIJENITI PRIJE LAUNCHA: snimka mobitelom"
+  },
+  {
+    "id": "pocetna-imanje",
+    "stranica": "Početna",
+    "mjesto": "Sekcija \"Nadomak Zagreba\", fotografija preko cijele širine",
+    "slika": "../../assets/images/imanje/panorama.jpg",
+    "alt": "Imanje s crvenim krovovima na brijegu, okruženo vinogradima i drvećem",
+    "napomena": "ZAMIJENITI PRIJE LAUNCHA: snimka mobitelom"
+  },
+  {
+    "id": "kontakt-procelje",
+    "stranica": "Kontakt",
+    "mjesto": "Uvod, uspravna fotografija desno (samo od 1024 px) i slika za dijeljenje",
+    "slika": "../../assets/images/pocetna/klet-zgrada.jpg",
+    "alt": "Pročelje Kleti obitelji Bunčić"
+  },
+  {
+    "id": "vjencanja-stablo",
+    "stranica": "Vjenčanja",
+    "mjesto": "Uvod \"Dragi mladenci\", uspravna fotografija",
+    "slika": "../../assets/images/vjencanja/cvjetno-stablo.jpg",
+    "alt": "Dekorativno stablo s bijelim cvjetovima uz zid od opeke"
+  },
+  {
+    "id": "vjencanja-vatromet",
+    "stranica": "Vjenčanja",
+    "mjesto": "\"Sve za vaš dan\", fotografija uz popis usluga",
+    "slika": "../../assets/images/vjencanja/vatromet-ples.jpg",
+    "alt": "Hladni vatromet i para na plesnom podiju tijekom prvog plesa"
+  },
+  {
+    "id": "vjencanja-dvorana",
+    "stranica": "Vjenčanja",
+    "mjesto": "Traka preko cijele širine ispod galerije",
+    "slika": "../../assets/images/dvorane/svijecnjaci.jpg",
+    "alt": "Svečano postavljena dvorana sa srebrnim svijećnjacima",
+    "napomena": "ZAMIJENITI PRIJE LAUNCHA: fotografija dvorane snimljena mobitelom (arhiva buncic.hr)"
+  },
+  {
+    "id": "ribarska-raznjic",
+    "stranica": "Ribarska koliba",
+    "mjesto": "Kuhinja, fotografija lijevo od jela (tamna traka)",
+    "slika": "../../assets/images/koliba/raznjic-vatra.jpg",
+    "alt": "Meso se peče na ražnju iznad otvorene vatre",
+    "napomena": "ZAMIJENITI PRIJE LAUNCHA: arhivska fotografija, 960 px"
+  }
+]

@@ -1,0 +1,16 @@
+---
+/*
+  Prikaz telefonskog broja u jedinstvenom obliku "+385 1 2753-947" (lib/kontakt.ts, formatTelefona).
+  NBSP unutar broja + white-space: nowrap, pa se broj nikad ne lomi u dva retka.
+*/
+import { formatTelefona } from '../lib/kontakt';
+
+interface Props {
+  broj: string;
+  class?: string;
+}
+
+const { broj, class: klasa = '' } = Astro.props;
+---
+
+<span class:list={['whitespace-nowrap', klasa]}>{formatTelefona(broj)}</span>

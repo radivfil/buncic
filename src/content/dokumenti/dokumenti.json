@@ -1,0 +1,42 @@
+[
+  {
+    "id": "jelovnici-svecane-prigode",
+    "naziv": "Jelovnici za svečane prigode",
+    "putanja": "/dokumenti/jelovnici-za-svecane-prigode.pdf",
+    "stranica": "proslave",
+    "tekstGumba": "Preuzmite jelovnike (PDF)",
+    "opis": "Jelovnici za grupne proslave: krštenja, pričesti, krizme, rođendani i domjenci",
+    "izvor": "Jelovnici/Jelovnici za svečane prigode.pdf",
+    "velicina": "10,7 MB"
+  },
+  {
+    "id": "a-la-carte-jelovnik",
+    "naziv": "À la carte jelovnik",
+    "putanja": "/dokumenti/a-la-carte-jelovnik.pdf",
+    "stranica": "restoran",
+    "tekstGumba": "Cijeli jelovnik",
+    "opis": "Cjelokupni jelovnik restorana Klet Bunčić",
+    "izvor": "Jelovnici/BUNCIC-klet-menu2024.pdf",
+    "velicina": "5,6 MB"
+  },
+  {
+    "id": "vjencanja-brosura",
+    "naziv": "Brošura Vjenčanja u Kleti obitelji Bunčić",
+    "putanja": "/dokumenti/vjencanja-brosura.pdf",
+    "stranica": "vjencanja",
+    "tekstGumba": "Brošura (PDF)",
+    "opis": "Sve za vaše vjenčanje na jednom mjestu",
+    "izvor": "Jelovnici/Vjenčanja.pdf",
+    "velicina": "16,2 MB"
+  },
+  {
+    "id": "ribarska-koliba-jelovnik",
+    "naziv": "Jelovnik Ribarske kolibe",
+    "putanja": "/dokumenti/ribarska-koliba-jelovnik.pdf",
+    "stranica": "ribarska-koliba",
+    "tekstGumba": "Cijeli jelovnik",
+    "opis": "Jelovnik restorana Ribarska koliba",
+    "izvor": "Jelovnici/RIBARSKA-KOLIBA-menu_2026.pdf",
+    "velicina": "5,2 MB"
+  }
+]

@@ -5,11 +5,11 @@ opisIzbornik: Restoran na obali jezera
 redoslijed: 6
 seoNaslov: Ribarska koliba | Restoran na jezeru, Dugo Selo
 seoOpis: Ribarska koliba obitelji Bunčić, restoran na obali jezera u Dugom Selu. Riba, jela s ražnja, gableci, terasa uz jezero i igralište za djecu.
-# Izvor teksta: buncic.hr/HR/koliba (arhiva, 2015.). Potvrditi aktualnu ponudu s klijentom.
+# Tekstovi: Matkove prepravke (faza 1d); cijeli jelovnik je PDF iz Jelovnici/RIBARSKA-KOLIBA-menu_2026.pdf (dokumenti.json).
 # ZAMIJENITI PRIJE LAUNCHA: fotografije su arhivske, 960 px (vidi FOTOGRAFIJE.md)
 naslovnica: ../../assets/images/koliba/jezero-vrbe.jpg
 naslovnicaAlt: Terasa Ribarske kolibe uz jezero okruženo vrbama
-uvod: Restoran na samoj obali jezera, na južnom kraju Dugog Sela. Domaća kuhinja, riba, jela s ražnja i velika terasa uz vodu.
+uvod: Okruženi jezerima i prirodom, uživajte na prostranoj terasi uz samu obalu. Očekuje vas bogata ponuda domaćih jela, ribljih specijaliteta, pečenja i jela s ražnja.
 galerija:
   - slika: ../../assets/images/koliba/koliba-jezero.jpg
     alt: Drvena zgrada Ribarske kolibe i travnjak uz jezero
@@ -19,6 +19,6 @@ galerija:
     alt: Terasa s kovanom ogradom i stolovima iznad jezera
 ---
 
-Ribarska koliba smještena je na samoj obali idiličnog jezera, gdje gosti mogu iskušati svoje ribičke vještine ili uživati u dugim šetnjama u prirodi. Mirno okruženje daleko od gradske vreve idealno je za obiteljske izlete.
+Samo nekoliko minuta od izlaza Rugvica s autoceste, a desetak minuta od IKEA-e, očekuje vas mirno okruženje jezera i zelenila. Ugodno mjesto za obiteljski ručak, druženje s prijateljima ili organizaciju proslava.
 
-Gosti nam najčešće dolaze zbog kuhinje, velike terase uz samo jezero i prostranog, ograđenog igrališta za djecu.
+Spoj prirode, blizine grada i kvalitetne kuhinje čini Ribarsku kolibu idealnom za posjet tijekom cijele godine.

@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
+import { preview } from './src/siteMode.mjs';
 
 // Statički build za Cloudflare Pages (build naredba: npm run build, izlaz: dist)
 export default defineConfig({
@@ -13,5 +14,6 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  integrations: [sitemap({ i18n: undefined, filter: (url) => !url.includes('/404') })],
+  // Sitemap samo u produkciji; u preview načinu stranica se ne smije indeksirati (src/siteMode.mjs)
+  integrations: preview ? [] : [sitemap({ i18n: undefined, filter: (url) => !url.includes('/404') })],
 });

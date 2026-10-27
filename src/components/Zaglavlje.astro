@@ -1,6 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
 import Ikona from './Ikona.astro';
+import { mjestoUIzborniku, navigacija } from '../lib/navigacija';
+import { getEntry } from 'astro:content';
+import { formatTelefona, telHref } from '../lib/kontakt';
+import Telefon from './Telefon.astro';
 
 interface Props {
   /** Zaglavlje leži preko hero fotografije dok se ne krene skrolati */
@@ -9,10 +12,14 @@ interface Props {
 }
 
 const { preko = false, tema = 'svijetla' } = Astro.props;
-const ponuda = (await getCollection('ponuda')).sort((a, b) => a.data.redoslijed - b.data.redoslijed);
 const put = Astro.url.pathname.replace(/\/$/, '') || '/';
 const aktivno = (href: string) => (href === '/' ? put === '/' : put.startsWith(href));
-const uPonudi = put.startsWith('/ponuda');
+// Redoslijed iz navigacija.json; Ribarska koliba je zasebna stavka glavne navigacije, nije u izborniku "Ponuda"
+const nav = await navigacija();
+const izbornik = nav.stranice;
+const telefon = (await getEntry('postavke', 'opce'))!.data.lokacije[0].telefoni[0];
+const telefonPrikaz = formatTelefona(telefon, { nbsp: false });
+const uPonudi = izbornik.some((p) => aktivno(`/ponuda/${p.id}`));
 ---
 
 <div id="vrh-straze" class="pointer-events-none absolute inset-x-0 top-0 h-24" aria-hidden="true"></div>
@@ -28,21 +35,27 @@ const uPonudi = put.startsWith('/ponuda');
     class="gumb-primarni sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50"
     >Preskoči na sadržaj</a
   >
-  <div class="okvir flex h-[72px] items-center justify-between gap-6 lg:h-20">
+  <!-- Od lg: logo | izbornik | telefon i tema u gridu 1fr auto 1fr, pa je izbornik točno na sredini -->
+  <div class="okvir flex h-[72px] items-center justify-between gap-6 lg:grid lg:h-20 lg:grid-cols-[1fr_auto_1fr]">
     <a href="/" class="flex shrink-0 items-center gap-3" aria-label="Obitelj Bunčić, početna stranica">
       <img src="/logo.svg" alt="" width="49" height="56" class="h-12 w-auto lg:h-14" />
-      <span class="hidden font-display text-lg leading-tight tracking-tight sm:block" translate="no">
+      <span class="hidden whitespace-nowrap font-display text-lg leading-tight tracking-tight sm:block" translate="no">
         Obitelj Bunčić
         <span class="block font-sans text-[0.8125rem] tracking-normal opacity-80">Klet, Dugo Selo</span>
       </span>
     </a>
 
     <nav aria-label="Glavna navigacija" class="hidden lg:block">
-      <ul class="flex items-center gap-1 text-[0.9375rem]">
-        <li>
-          <a href="/" class="nav-poveznica" aria-current={aktivno('/') ? 'page' : undefined}>Početna</a>
-        </li>
-        <li class="relative" data-padajuci>
+      <ul class="flex items-center gap-1 whitespace-nowrap text-[0.9375rem]">
+        {
+          nav.glavnaPrije.map((s) => (
+            <li>
+              <a href={s.href} class="nav-poveznica" aria-current={aktivno(s.href!) ? 'page' : undefined}>{s.tekst}</a>
+            </li>
+          ))
+        }
+        <!-- Ploča se pozicionira prema zaglavlju (ne prema stavci), centrirano i uvijek unutar ekrana -->
+        <li data-padajuci>
           <button
             type="button"
             class="nav-poveznica inline-flex items-center gap-1.5"
@@ -51,26 +64,33 @@ const uPonudi = put.startsWith('/ponuda');
             data-padajuci-gumb
             data-aktivno={uPonudi ? '' : undefined}
           >
-            Ponuda
+            {nav.ponuda.tekst}
             <Ikona ime="caret-down" velicina={14} class="strelica transition-transform duration-300" />
           </button>
           <div
             id="izbornik-ponuda"
-            class="padajuci absolute left-1/2 top-full w-[560px] -translate-x-1/2 pt-3"
+            class="padajuci absolute left-1/2 top-full w-[min(840px,calc(100vw-2rem))] -translate-x-1/2 whitespace-normal pt-3"
             hidden
             data-padajuci-ploca
           >
             <div class="border border-rub/10 bg-pozadina p-3 text-tekst shadow-[0_24px_60px_-20px_rgba(61,28,18,0.35)]">
-              <ul class="grid grid-cols-2 gap-1">
+              <!-- Tri stupca: Vjenčanja zauzimaju cijeli prvi stupac, ostalih šest redom po tri u stupcu -->
+              <ul class="grid grid-cols-3 grid-rows-3 gap-1">
                 {
-                  ponuda.map((p) => (
-                    <li>
+                  izbornik.map((p, i) => (
+                    <li
+                      class:list={[i === 0 && 'row-span-3']}
+                      style={`grid-column:${mjestoUIzborniku(i).stupac + 1};grid-row:${i === 0 ? '1 / span 3' : mjestoUIzborniku(i).red}`}
+                    >
                       <a
                         href={`/ponuda/${p.id}`}
-                        class="group block px-4 py-3 transition-colors hover:bg-pozadina-2 focus-visible:bg-pozadina-2"
+                        class:list={[
+                          'group block h-full px-4 py-3 break-words transition-colors hover:bg-pozadina-2 focus-visible:bg-pozadina-2',
+                          i === 0 && 'bg-pozadina-2/50',
+                        ]}
                         aria-current={aktivno(`/ponuda/${p.id}`) ? 'page' : undefined}
                       >
-                        <span class="flex items-center justify-between font-display text-lg text-naglasak">
+                        <span class="flex items-center justify-between gap-2 font-display text-lg text-naglasak">
                           {p.data.nazivIzbornik}
                           <Ikona
                             ime="arrow-right"
@@ -87,18 +107,20 @@ const uPonudi = put.startsWith('/ponuda');
             </div>
           </div>
         </li>
-        <li>
-          <a href="/novosti" class="nav-poveznica" aria-current={aktivno('/novosti') ? 'page' : undefined}
-            >Novosti i događanja</a
-          >
-        </li>
+        {
+          nav.glavnaPoslije.map((s) => (
+            <li>
+              <a href={s.href} class="nav-poveznica" aria-current={aktivno(s.href!) ? 'page' : undefined}>{s.tekst}</a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
 
-    <div class="flex items-center gap-2">
-      <a href="tel:+38512781133" class="nav-poveznica items-center gap-2" aria-label="Nazovite nas: 01 2781-133">
+    <div class="flex items-center gap-2 lg:justify-self-end">
+      <a href={telHref(telefon)} class="nav-poveznica items-center gap-2" aria-label={`Nazovite nas: ${telefonPrikaz}`}>
         <Ikona ime="phone" velicina={20} />
-        <span class="hidden xs:inline">01 2781-133</span>
+        <span class="hidden xs:inline"><Telefon broj={telefon} /></span>
       </a>
       <button
         type="button"
@@ -110,11 +132,6 @@ const uPonudi = put.startsWith('/ponuda');
         <Ikona ime="moon" velicina={22} class="ikona-mjesec" />
         <Ikona ime="sun" velicina={22} class="ikona-sunce" />
       </button>
-      <a
-        href="/kontakt"
-        class="kontakt-cta gumb hidden min-h-11 px-5 sm:inline-flex"
-        aria-current={aktivno('/kontakt') ? 'page' : undefined}>Kontakt</a
-      >
       <button
         type="button"
         class="-mr-2 inline-flex h-12 w-12 items-center justify-center lg:hidden"
@@ -155,7 +172,7 @@ const uPonudi = put.startsWith('/ponuda');
   </div>
   <nav aria-label="Mobilna navigacija" class="okvir flex flex-1 flex-col pb-10 pt-6">
     <ul class="flex flex-col gap-1 font-display text-3xl">
-      <li data-mob-stavka><a href="/" class="block py-2">Početna</a></li>
+      {nav.glavnaPrije.map((s) => <li data-mob-stavka><a href={s.href} class="block py-2">{s.tekst}</a></li>)}
       <li data-mob-stavka>
         <button
           type="button"
@@ -164,13 +181,17 @@ const uPonudi = put.startsWith('/ponuda');
           aria-controls="mob-ponuda"
           data-mob-ponuda-gumb
         >
-          Ponuda
+          {nav.ponuda.tekst}
           <Ikona ime="caret-down" velicina={22} class="strelica transition-transform duration-300" />
         </button>
-        <ul id="mob-ponuda" class="mb-2 border-l border-zlato/40 pl-5 font-sans text-lg" hidden={!uPonudi}>
+        <!-- Mobitel: jedan stupac; tablet (md): Vjenčanja preko cijele širine, ispod dva stupca -->
+        <ul id="mob-ponuda" class="mb-2 border-l border-zlato/40 pl-5 font-sans text-lg md:grid md:grid-cols-2 md:gap-x-10" hidden={!uPonudi}>
           {
-            ponuda.map((p) => (
-              <li>
+            izbornik.map((p, i) => (
+              <li
+                class:list={[i === 0 ? 'md:col-span-2' : 'md:[grid-column:var(--k)] md:[grid-row:var(--r)]']}
+                style={i === 0 ? undefined : `--k:${mjestoUIzborniku(i).stupac};--r:${mjestoUIzborniku(i).red + 1}`}
+              >
                 <a href={`/ponuda/${p.id}`} class="block py-2 text-krem/85 hover:text-krem" aria-current={aktivno(`/ponuda/${p.id}`) ? 'page' : undefined}>
                   {p.data.nazivIzbornik}
                 </a>
@@ -179,12 +200,11 @@ const uPonudi = put.startsWith('/ponuda');
           }
         </ul>
       </li>
-      <li data-mob-stavka><a href="/novosti" class="block py-2">Novosti i događanja</a></li>
+      {nav.glavnaPoslije.map((s) => <li data-mob-stavka><a href={s.href} class="block py-2">{s.tekst}</a></li>)}
     </ul>
     <div class="mt-auto flex flex-col gap-4 pt-10" data-mob-stavka>
-      <a href="/kontakt" class="gumb-svijetli w-full">Kontakt</a>
-      <a href="tel:+38512781133" class="inline-flex items-center gap-2 text-krem/85">
-        <Ikona ime="phone" velicina={18} /> 01 2781-133
+      <a href={telHref(telefon)} class="inline-flex min-h-11 items-center gap-2 text-krem/85">
+        <Ikona ime="phone" velicina={18} /> <Telefon broj={telefon} />
       </a>
     </div>
   </nav>
@@ -230,6 +250,16 @@ const uPonudi = put.startsWith('/ponuda');
   .nav-poveznica:hover {
     opacity: 1;
   }
+  /* 1024-1279 px: uži razmaci, da logo, izbornik i telefon "+385 1 2781-133" stanu bez lomljenja i sudara */
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .nav-poveznica {
+      padding-inline: 0.625rem;
+    }
+    .nav-poveznica::after {
+      left: 0.625rem;
+      right: 0.625rem;
+    }
+  }
   .nav-poveznica::after {
     content: '';
     position: absolute;
@@ -267,22 +297,6 @@ const uPonudi = put.startsWith('/ponuda');
     transform: rotate(180deg);
   }
 
-  .kontakt-cta {
-    background: var(--color-bordo);
-    color: var(--color-krem);
-  }
-  .kontakt-cta:hover {
-    background: var(--color-bordo-700);
-  }
-  .zaglavlje[data-tema='podrum'] .kontakt-cta,
-  .zaglavlje[data-preko]:not([data-skrolano]) .kontakt-cta {
-    background: var(--color-krem);
-    color: var(--color-bordo-900);
-  }
-  .zaglavlje[data-tema='podrum'] .kontakt-cta:hover,
-  .zaglavlje[data-preko]:not([data-skrolano]) .kontakt-cta:hover {
-    background: var(--color-zlato-300);
-  }
 </style>
 
 <script>

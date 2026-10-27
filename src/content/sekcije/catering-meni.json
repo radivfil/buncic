@@ -1,0 +1,20 @@
+{
+  "naslov": "Meni koji slažete s nama",
+  "stavke": [
+    {
+      "ikona": "fork-knife",
+      "naslov": "Vrsta cateringa",
+      "opis": "Mali zalogaji, švedski stol, topla jela, kombinirana ponuda, slastice"
+    },
+    {
+      "ikona": "call-bell",
+      "naslov": "Dodatne usluge",
+      "opis": "Oprema, inventar, osoblje, priprema na lokaciji"
+    },
+    {
+      "ikona": "clipboard-text",
+      "naslov": "Vaše želje",
+      "opis": "Posebni zahtjevi i individualni dogovor"
+    }
+  ]
+}

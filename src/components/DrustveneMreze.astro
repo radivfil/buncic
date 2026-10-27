@@ -1,0 +1,69 @@
+---
+/*
+  Ikone društvenih mreža. Popis mreža: postavke.json -> drustveneMreze.
+  Simbol svake mreže je SVG u src/assets/drustvene/<ikona>.svg (currentColor), a podlogu daje sam link,
+  pa se nova mreža dodaje SVG datotekom i retkom u podacima, bez diranja ove komponente.
+
+  Boje su iste u obje teme (tokeni iz global.css): smeđa podloga (bordo) + krem simbol.
+  Smještaj određuje roditelj (Podnozje.astro) preko klasa; komponenta postoji na jednom mjestu.
+*/
+import { getEntry } from 'astro:content';
+
+interface Props {
+  class?: string;
+}
+const { class: klasa = '' } = Astro.props;
+
+const svgs = import.meta.glob<string>('/src/assets/drustvene/*.svg', { query: '?raw', import: 'default', eager: true });
+const mreze = (await getEntry('postavke', 'opce'))!.data.drustveneMreze;
+
+const ikona = (ime: string) => {
+  const svg = svgs[`/src/assets/drustvene/${ime}.svg`];
+  if (!svg) throw new Error(`Ikona društvene mreže "${ime}" ne postoji u src/assets/drustvene/.`);
+  return svg.replace('<svg ', '<svg aria-hidden="true" focusable="false" class="block h-full w-full" ');
+};
+---
+
+<ul class:list={['drustvene-mreze flex items-center gap-3', klasa]}>
+  {
+    mreze.map((m) => (
+      <li>
+        <a href={m.url} target="_blank" rel="noopener noreferrer" aria-label={m.oznaka} class="mreza block size-11 rounded-[22%]">
+          <Fragment set:html={ikona(m.ikona)} />
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .mreza {
+    background: var(--color-bordo);
+    color: var(--color-krem);
+    transition:
+      transform 150ms ease-out,
+      background-color 150ms ease-out;
+  }
+  /* Podloga prema tamnoj pozadini podnožja ima kontrast samo ~1,9 : 1, pa tanki svijetli obrub ocrtava oblik */
+  .mreza {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+  .mreza:hover,
+  .mreza:focus-visible {
+    transform: translateY(-2px);
+    background: var(--color-bordo-700);
+  }
+  .mreza:focus-visible {
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mreza {
+      transition: background-color 150ms ease-out;
+    }
+    .mreza:hover,
+    .mreza:focus-visible {
+      transform: none;
+    }
+  }
+
+</style>

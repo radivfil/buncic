@@ -1,0 +1,45 @@
+[
+  {
+    "id": "vjencanja",
+    "heroPodnaslov": "Svečane dvorane, bogata gastronomska ponuda i iskusna organizacija s pažnjom posvećenom svakom detalju. Sve za vaše vjenčanje na jednom mjestu.",
+    "ukljuceno": {
+      "naslov": "Sve za vaš dan, na jednom mjestu",
+      "skupine": [
+        {
+          "naslov": "Za stolom",
+          "ikona": "bowl-steam",
+          "stavke": [
+            "Svadbeni jelovnik po domaćim recepturama",
+            "Torte i kolači naših slastičara",
+            "Slatki švedski stol ili posluživanje za stolom"
+          ]
+        },
+        {
+          "naslov": "Dekoracija",
+          "ikona": "flower-tulip",
+          "stavke": [
+            "Kompletna dekoracija dvorane po želji",
+            "Mladenački buket, kitice i reveri",
+            "Dekoracija automobila i crkve",
+            "Izrada pozivnica i zahvalnica"
+          ]
+        },
+        {
+          "naslov": "Za vas i goste",
+          "ikona": "users-three",
+          "stavke": [
+            "Više dvorana prema broju uzvanika",
+            "Mogućnost prijema na otvorenom",
+            "Smještaj za goste i osiguran parking"
+          ]
+        }
+      ]
+    },
+    "odabir": {
+      "naslov": "Koliko gostiju očekujete?",
+      "podnaslov": "Odaberite broj uzvanika i otkrijte koje dvorane najbolje odgovaraju vašem vjenčanju.",
+      "oznakaPrimjer": "Kapaciteti su primjer",
+      "napomenaSpajanje": "Postoji mogućnost spajanja dvije dvorane u slučaju većeg broja gostiju."
+    }
+  }
+]

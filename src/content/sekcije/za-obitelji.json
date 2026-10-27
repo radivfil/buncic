@@ -1,0 +1,17 @@
+{
+  "naslov": "Za obitelji, vrtiće i škole",
+  "stavke": [
+    {
+      "ikona": "tree",
+      "naslov": "Škola u prirodi",
+      "opis": "Cjelodnevni boravak i izleti za vrtiće i škole."
+    },
+    {
+      "ikona": "park",
+      "naslov": "Igralište i mali zoo",
+      "opis": "Dječje igralište usred voćnjaka i mali zoološki vrt s domaćim životinjama."
+    }
+  ],
+  "slika": "../../assets/images/imanje/staza-sjenica.jpg",
+  "alt": "Popločana staza kroz park imanja uz drvenu sjenicu"
+}

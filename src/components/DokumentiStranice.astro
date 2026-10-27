@@ -1,0 +1,34 @@
+---
+/*
+  Redak s dokumentima stranice (npr. cijeli jelovnik): naziv lijevo, gumb desno.
+  Podaci: src/content/dokumenti/dokumenti.json, polje stranica = id iz ponuda/.
+  varijanta "obrub-svijetli" za tamnu podlogu (prosljeđuje se gumbu).
+*/
+import GumbDokument from './GumbDokument.astro';
+import { dokumentiStranice } from '../lib/dokumenti';
+
+interface Props {
+  stranica: string;
+  varijanta?: 'obrub' | 'obrub-svijetli';
+  class?: string;
+}
+
+const { stranica, varijanta = 'obrub', class: klasa = '' } = Astro.props;
+const dokumenti = await dokumentiStranice(stranica);
+---
+
+{
+  dokumenti.length > 0 && (
+    <ul class:list={['border-t border-current/15', klasa]} aria-label="Dokumenti za preuzimanje">
+      {dokumenti.map((dok) => (
+        <li class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 border-b border-current/15 py-6">
+          <div>
+            <p class="font-display text-2xl md:text-3xl">{dok.naziv}</p>
+            {dok.opis && <p class="mt-1 max-w-[52ch] text-sm leading-relaxed opacity-75">{dok.opis}</p>}
+          </div>
+          <GumbDokument dokument={dok} varijanta={varijanta} />
+        </li>
+      ))}
+    </ul>
+  )
+}

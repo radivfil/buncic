@@ -1,10 +1,14 @@
 ---
 import { Picture } from 'astro:assets';
+import { preview } from '../../siteMode.mjs';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Osnovni from '../../layouts/Osnovni.astro';
 import Ikona from '../../components/Ikona.astro';
 import KarticaNovosti from '../../components/KarticaNovosti.astro';
 import { formatirajDatum } from '../../lib/datum';
+import { getEntry } from 'astro:content';
+import { telHref } from '../../lib/kontakt';
+import Telefon from '../../components/Telefon.astro';
 
 export async function getStaticPaths() {
   const objave = await getCollection('novosti');
@@ -25,8 +29,14 @@ const shema = {
   headline: d.naslov,
   datePublished: d.datum.toISOString(),
   description: d.sazetak,
-  publisher: { '@type': 'Organization', name: 'Obitelj Bunčić', logo: { '@type': 'ImageObject', url: 'https://buncic.hr/logo.svg' } },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Obitelj Bunčić',
+    // Adresa na produkcijsku domenu samo u produkciji (src/siteMode.mjs)
+    ...(!preview && { logo: { '@type': 'ImageObject', url: 'https://buncic.hr/logo.svg' } }),
+  },
 };
+const telefon = (await getEntry('postavke', 'opce'))!.data.lokacije[0].telefoni[0];
 ---
 
 <Osnovni naslov={`${d.naslov} | Obitelj Bunčić`} opis={d.sazetak} slika={d.naslovnica} tipStranice="article" shema={shema}>
@@ -46,7 +56,7 @@ const shema = {
       </div>
       <div class="mt-12 flex flex-wrap gap-3 border-t border-rub/15 pt-8">
         <a href="/kontakt" class="gumb-primarni">Pošaljite upit</a>
-        <a href="tel:+38512781133" class="gumb-obrub text-naglasak"><Ikona ime="phone" velicina={18} /> 01 2781-133</a>
+        <a href={telHref(telefon)} class="gumb-obrub text-naglasak"><Ikona ime="phone" velicina={18} /> <Telefon broj={telefon} /></a>
       </div>
     </div>
     <div class="lg:col-span-5">

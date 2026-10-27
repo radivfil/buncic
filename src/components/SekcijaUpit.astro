@@ -2,6 +2,9 @@
 /* Sekcija s obrascem za upit: naslov i kontakt lijevo, obrazac desno */
 import Obrazac from './Obrazac.astro';
 import Ikona from './Ikona.astro';
+import { getEntry } from 'astro:content';
+import { telHref } from '../lib/kontakt';
+import Telefon from './Telefon.astro';
 
 interface Props {
   naslov: string;
@@ -13,6 +16,7 @@ interface Props {
 }
 
 const { naslov, opis, vrsta, prigoda, tamno = false, id = 'upit' } = Astro.props;
+const postavke = (await getEntry('postavke', 'opce'))!.data;
 ---
 
 <section id={id} class:list={['scroll-mt-24', tamno ? 'bg-podrum-800 text-krem' : 'bg-pozadina-2/60']}>
@@ -22,18 +26,18 @@ const { naslov, opis, vrsta, prigoda, tamno = false, id = 'upit' } = Astro.props
       <p class:list={['mt-6 max-w-[40ch] text-lg leading-relaxed', tamno ? 'text-krem/80' : 'text-tekst-meki']}>{opis}</p>
       <ul class:list={['mt-10 space-y-4', tamno ? 'text-krem/85' : 'text-tekst']}>
         <li>
-          <a href="tel:+38512781133" class="inline-flex items-center gap-3 hover:underline">
-            <Ikona ime="phone" velicina={22} class={tamno ? 'text-zlato' : 'text-naglasak'} /> 01 2781-133
+          <a href={telHref(postavke.telefon)} class="inline-flex min-h-11 items-center gap-3 hover:underline">
+            <Ikona ime="phone" velicina={22} class={tamno ? 'text-zlato' : 'text-naglasak'} /> <Telefon broj={postavke.telefon} />
           </a>
         </li>
         <li>
-          <a href="tel:+385914450654" class="inline-flex items-center gap-3 hover:underline">
-            <Ikona ime="device-mobile" velicina={22} class={tamno ? 'text-zlato' : 'text-naglasak'} /> 091 4450-654
+          <a href={telHref(postavke.mobitel)} class="inline-flex min-h-11 items-center gap-3 hover:underline">
+            <Ikona ime="device-mobile" velicina={22} class={tamno ? 'text-zlato' : 'text-naglasak'} /> <Telefon broj={postavke.mobitel} />
           </a>
         </li>
         <li>
-          <a href="mailto:info@buncic.hr" class="inline-flex items-center gap-3 hover:underline">
-            <Ikona ime="envelope-simple" velicina={22} class={tamno ? 'text-zlato' : 'text-naglasak'} /> info@buncic.hr
+          <a href={`mailto:${postavke.email}`} class="inline-flex min-h-11 items-center gap-3 hover:underline">
+            <Ikona ime="envelope-simple" velicina={22} class={tamno ? 'text-zlato' : 'text-naglasak'} /> {postavke.email}
           </a>
         </li>
       </ul>

@@ -16,3 +16,12 @@ dist/
 .impeccable/
 lighthouse/
 reference/
+
+# Izvorni materijali klijenta (nisu dio stranice, ne idu u javni repo)
+Jelovnici/
+MatkoPrepravke/
+*.docx
+
+# Interne radne bilješke (nepotvrđeni podaci, pitanja vlasniku); ostaju samo lokalno
+docs/*
+!docs/objava-i-povratak.md

@@ -1,0 +1,20 @@
+{
+  "naslov": "Riba – morska i slatkovodna",
+  "odlomci": [
+    "Jadranska riba, lignje, slatkovodni specijaliteti i morski plodovi."
+  ],
+  "stavke": [
+    {
+      "naslov": "Pečenja i jela s ražnja",
+      "opis": "Teletina ispod peke, mlada jaretina s ražnja, hrskavi odojak."
+    },
+    {
+      "naslov": "Dnevna jela i gableci",
+      "opis": "Širok izbor svakodnevno pripremljenih jela i gableca."
+    },
+    {
+      "naslov": "Fiš paprikaš",
+      "opis": "Od slatkovodne ribe, po domaćoj recepturi"
+    }
+  ]
+}

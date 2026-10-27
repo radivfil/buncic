@@ -1,0 +1,12 @@
+{
+  "naslov": "Sadržaji soba",
+  "stavke": [
+    { "ikona": "television-simple", "naslov": "TV" },
+    { "ikona": "snowflake", "naslov": "Klima uređaj" },
+    { "ikona": "door-open", "naslov": "Recepcija od 0 do 24 h" },
+    { "ikona": "bathtub", "naslov": "Vlastita kupaonica" },
+    { "ikona": "wifi-high", "naslov": "Internet" },
+    { "ikona": "car-profile", "naslov": "Parking" },
+    { "ikona": "garage", "naslov": "Podzemna garaža" }
+  ]
+}

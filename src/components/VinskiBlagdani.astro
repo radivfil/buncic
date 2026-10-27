@@ -1,0 +1,21 @@
+---
+/*
+  Sekcija godišnjih događanja "Ljubav, žene i vino. Imamo razloga za slavlje." (Valentinovo, Dan žena, Martinje).
+  Na stranici Proslave i svečanosti (u fazi 1b bila na Izletima u prirodi, vraćena u fazi 1d).
+  Sadržaj: src/content/sekcije/vinski-blagdani.json. Uklanja se brisanjem importa na stranici.
+*/
+import { getEntry } from 'astro:content';
+import FotoTraka from './FotoTraka.astro';
+
+// ZAMIJENITI PRIJE LAUNCHA: arhivska fotografija (mobitel)
+const s = (await getEntry('sekcije', 'vinski-blagdani'))!.data;
+---
+
+<FotoTraka slika={s.slika!} alt={s.alt!} poravnanje="lijevo" pozicija="object-[60%_50%]">
+  <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl">
+    {s.naslov}{s.naslovIstaknuto && <> <em class="block italic text-zlato">{s.naslovIstaknuto}</em></>}
+  </h2>
+  <div class="proza mt-6 text-lg leading-relaxed text-krem/85">
+    {s.odlomci.map((o) => <p>{o}</p>)}
+  </div>
+</FotoTraka>

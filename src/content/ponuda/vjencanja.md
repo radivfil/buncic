@@ -1,13 +1,13 @@
 ---
 naslov: Vjenčanja
 nazivIzbornik: Vjenčanja
-opisIzbornik: Svadbe u dvoranama i obred na otvorenom
+opisIzbornik: Vaš poseban dan u našim svečanim dvoranama
 redoslijed: 1
 seoNaslov: Vjenčanja na imanju | Obitelj Bunčić, Dugo Selo
 seoOpis: Vjenčanje na obiteljskom imanju Bunčić. Više dvorana, obred na otvorenom, vlastiti kuhari i slastičari, dekoracija i smještaj za goste nadomak Zagreba.
 naslovnica: ../../assets/images/vjencanja/prvi-ples.jpg
 naslovnicaAlt: Mladenci u prvom plesu, oko njih oblak bijele pare u svečanoj dvorani
-uvod: Nezaboravna vjenčanja i originalne svadbene svečanosti naša su specijalnost. Svaki dan prilagođavamo vašim željama, od prvog razgovora do posljednjeg plesa.
+uvod: Nezaboravna vjenčanja i originalne svadbene svečanosti naša su specijalnost.
 # ZAMIJENITI PRIJE LAUNCHA: sve fotografije u galeriji snimljene su mobitelom (vidi FOTOGRAFIJE.md)
 galerija:
   - slika: ../../assets/images/vjencanja/obred-vani.jpg
@@ -24,8 +24,10 @@ galerija:
 
 Dragi mladenci,
 
-za vaše vjenčanje nudimo vrhunski gastronomski užitak na stolu i sve ostale usluge koje su potrebne za vaš dan. Veliku pozornost posvećujemo svakom detalju: od izbora najboljih i najsvježijih namirnica, pomnog planiranja, iskusnih kuhara i profesionalnog osoblja do same izvedbe i organizacije.
+Svako vjenčanje posebno je na svoj način, a naša je želja da vaše bude upravo onakvo kakvim ste ga zamislili. Zato svakom slavlju pristupamo individualno, pažljivo slušamo vaše želje i svojim iskustvom pomažemo vam u planiranju svakog dijela vašeg posebnog dana.
 
-Imanje se nalazi u srcu prirode, okruženo mirnim i pitomim krajolikom. Idealno je za fotografiranje i za obred vjenčanja na otvorenom.
+Uz svečane dvorane i bogatu gastronomsku ponudu, nudimo vam cjelokupnu organizaciju vjenčanja. Od uređenja i dekoracije prostora, izrade pozivnica i zahvalnica, svadbenih torti i slastica pa sve do posebnih efekata poput niskog dima i prskalica – brinemo o svakom detalju kako biste sve mogli dogovoriti na jednom mjestu.
 
-Uz vaše želje i naše dugogodišnje iskustvo, vaš dan bit će upravo onakav kakav ste zamislili.
+Naše imanje, okruženo vinogradima i zelenilom Martin brega, pruža prekrasno okruženje za svečani prijem gostiju, svadbene fotografije i obred vjenčanja na otvorenom.
+
+Uz dugogodišnje iskustvo, predanost i osoban pristup, pobrinut ćemo se da vi i vaši gosti bezbrižno uživate u svakom trenutku svadbenog slavlja.

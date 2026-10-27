@@ -5,22 +5,26 @@ import Osnovni from '../layouts/Osnovni.astro';
 import Ikona from '../components/Ikona.astro';
 import Obrazac from '../components/Obrazac.astro';
 import Karta from '../components/Karta.astro';
-import zgrada from '../assets/images/pocetna/klet-zgrada.jpg';
+import { slika } from '../lib/slike';
 
 const postavke = (await getEntry('postavke', 'opce'))!.data;
-const tel = (b: string) => `tel:${b.replace(/[^\d+]/g, '')}`;
+// Fotografija uvoda: src/content/slike/slike.json
+const zgrada = await slika('kontakt-procelje');
 
 const kartice = [
   { id: 'dogadjaj', naziv: 'Vjenčanja i proslave', ikona: 'champagne' },
   { id: 'smjestaj', naziv: 'Smještaj', ikona: 'bed' },
   { id: 'opci', naziv: 'Opći upit', ikona: 'envelope-simple' },
 ] as const;
+import RedakRadnogVremena from '../components/RedakRadnogVremena.astro';
+import { formatTelefona, kartaAria, kartaHref, telHref } from '../lib/kontakt';
+import Telefon from '../components/Telefon.astro';
 ---
 
 <Osnovni
   naslov="Kontakt | Obitelj Bunčić, Dugo Selo"
-  opis="Kontakt Kleti obitelji Bunčić, Šaškovečka 182, Dugo Selo. Telefon 01 2781-133, info@buncic.hr. Upiti za vjenčanja, proslave i smještaj."
-  slika={zgrada}
+  opis={`Kontakt Kleti obitelji Bunčić, Šaškovečka ulica 182, Dugo Selo. Telefon ${formatTelefona(postavke.lokacije[0].telefoni[0], { nbsp: false })}, info@buncic.hr. Upiti za vjenčanja, proslave i smještaj.`}
+  slika={zgrada.slika}
 >
   <section class="okvir grid gap-10 pb-16 pt-16 lg:grid-cols-12 lg:pt-24">
     <div class="lg:col-span-7" data-hero>
@@ -29,13 +33,13 @@ const kartice = [
         Za sve informacije i rezervacije nazovite nas ili ispunite obrazac. Odgovaramo unutar jednog radnog dana.
       </p>
       <div class="mt-9 flex flex-wrap gap-3">
-        <a href="tel:+38512781133" class="gumb-primarni"><Ikona ime="phone" velicina={18} /> 01 2781-133</a>
+        <a href={telHref(postavke.lokacije[0].telefoni[0])} class="gumb-primarni"><Ikona ime="phone" velicina={18} /> <Telefon broj={postavke.lokacije[0].telefoni[0]} /></a>
         <a href={`mailto:${postavke.email}`} class="gumb-obrub text-naglasak"><Ikona ime="envelope-simple" velicina={18} /> {postavke.email}</a>
       </div>
     </div>
     <div class="hidden lg:col-span-4 lg:col-start-9 lg:block" data-hero-slika>
       <div class="aspect-[4/5] overflow-hidden">
-        <Picture src={zgrada} alt="Pročelje Kleti obitelji Bunčić" formats={['avif', 'webp']} widths={[400, 700]} sizes="30vw" loading="eager" class="h-full w-full object-cover object-[30%_50%]" />
+        <Picture src={zgrada.slika} alt={zgrada.alt} formats={['avif', 'webp']} widths={[400, 700]} sizes="30vw" loading="eager" class="h-full w-full object-cover object-[30%_50%]" />
       </div>
     </div>
   </section>
@@ -80,13 +84,13 @@ const kartice = [
     <h2 id="lokacije-naslov" class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Gdje smo</h2>
     <div class="mt-12 grid gap-12 md:grid-cols-2 lg:grid-cols-12" data-reveal-grupa>
       {
-        postavke.lokacije.map((l, i) => (
+        postavke.lokacije.filter((l) => l.naKontaktu).map((l, i) => (
           <div class:list={['border-t-2 pt-8', i === 0 ? 'border-naglasak lg:col-span-5' : 'border-rub/20 lg:col-span-3', i === 2 && 'md:col-span-2 lg:col-span-4']} data-reveal>
             <h3 class="font-display text-2xl md:text-3xl">{l.naziv}</h3>
             <address class="mt-5 space-y-2 not-italic text-tekst-meki">
-              <p class="flex gap-3"><Ikona ime="map-pin" velicina={20} class="mt-0.5 shrink-0 text-naglasak" />{l.adresa}</p>
+              <a href={kartaHref(l)} target="_blank" rel="noopener noreferrer" aria-label={kartaAria(l)} class="flex min-h-11 items-center gap-3 hover:text-naglasak md:min-h-0 md:items-start"><Ikona ime="map-pin" velicina={20} class="shrink-0 text-naglasak md:mt-0.5" />{l.adresa}</a>
               {l.telefoni.map((t) => (
-                <a href={tel(t)} class="flex gap-3 hover:text-naglasak"><Ikona ime="phone" velicina={20} class="mt-0.5 shrink-0 text-naglasak" />{t}</a>
+                <a href={telHref(t)} class="flex min-h-11 items-center gap-3 hover:text-naglasak md:min-h-0"><Ikona ime="phone" velicina={20} class="shrink-0 text-naglasak" /><Telefon broj={t} /></a>
               ))}
               {l.email && (
                 <a href={`mailto:${l.email}`} class="flex gap-3 hover:text-naglasak"><Ikona ime="envelope-simple" velicina={20} class="mt-0.5 shrink-0 text-naglasak" />{l.email}</a>
@@ -94,11 +98,11 @@ const kartice = [
             </address>
             {l.radnoVrijeme.length > 0 && (
               <ul class="mt-5 space-y-1 text-sm text-tekst-meki">
-                {l.radnoVrijeme.map((r) => <li>{r}</li>)}
+                {l.radnoVrijeme.map((r) => <li><RedakRadnogVremena r={r} /></li>)}
               </ul>
             )}
             {i === 0 && (
-              <a href={postavke.kartaUrl} target="_blank" rel="noopener" class="poveznica mt-6 text-naglasak">
+              <a href={kartaHref(l)} target="_blank" rel="noopener noreferrer" class="poveznica mt-6 text-naglasak">
                 Otvori u Google kartama <Ikona ime="arrow-up-right" velicina={16} />
               </a>
             )}
@@ -110,6 +114,8 @@ const kartice = [
       <Karta
         naziv={postavke.lokacije[0].naziv}
         adresa={postavke.lokacije[0].adresa}
+        kartaHref={kartaHref(postavke.lokacije[0])}
+        kartaAria={kartaAria(postavke.lokacije[0])}
         koordinate={postavke.lokacije[0].koordinate!}
         upute={['Imanje je na Martin bregu, iznad središta Dugog Sela.', 'Parkiralište pod nadzorom i podzemna garaža na imanju.']}
       />

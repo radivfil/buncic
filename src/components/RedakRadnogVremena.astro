@@ -1,0 +1,14 @@
+---
+/*
+  Jedan redak radnog vremena, npr. "Ponedjeljak - nedjelja: 8-22h".
+  Od 390 px je u jednom retku; na užem ekranu lomi se samo između dana i vremena.
+*/
+import type { RedakRadnogVremena } from '../lib/radnoVrijeme';
+
+interface Props {
+  r: RedakRadnogVremena;
+}
+const { r } = Astro.props;
+---
+
+<span class="min-[390px]:whitespace-nowrap"><span class="whitespace-nowrap">{r.dani}:</span> <span class="whitespace-nowrap">{r.vrijeme}</span></span>

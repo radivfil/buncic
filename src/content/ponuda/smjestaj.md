@@ -1,10 +1,10 @@
 ---
 naslov: Smještaj
 nazivIzbornik: Smještaj
-opisIzbornik: 40 soba usred vinograda i voćnjaka
+opisIzbornik: Smještaj za goste, grupe i poslovne potrebe
 redoslijed: 5
 seoNaslov: Smještaj na imanju | 40 soba, Obitelj Bunčić
-seoOpis: 40 komfornih soba na imanju obitelji Bunčić u Dugom Selu. Klima, TV, mini bar, parking pod nadzorom i recepcija 0-24, nadomak Zagreba.
+seoOpis: 40 soba na imanju obitelji Bunčić u Dugom Selu, od jednokrevetnih do četverokrevetnih. TV, klima, vlastita kupaonica, internet, parking i recepcija 0-24.
 # ZAMIJENITI PRIJE LAUNCHA: sve fotografije su arhivske snimke mobitelom, nema fotografija soba (vidi FOTOGRAFIJE.md)
 naslovnica: ../../assets/images/imanje/procelje.jpg
 naslovnicaAlt: Pročelje Kleti obitelji Bunčić od crvene opeke s drvenim balkonima
@@ -22,6 +22,6 @@ galerija:
     alt: Dječje igralište na travnjaku uz drvenu kuću
 ---
 
-Sobe su opremljene televizorom sa satelitskim programom, mini barom, klimom i vlastitom kupaonicom, a gostima je dostupan i internet. Na raspolaganju je prostrano parkiralište pod nadzorom i podzemna garaža.
+U sklopu našeg imanja na raspolaganju su sobe različitih kapaciteta, namijenjene pojedincima, poslovnim gostima, organiziranim grupama te gostima vjenčanja i proslava. Sve sobe imaju TV, vlastitu kupaonicu i klima-uređaj, a gostima su dostupni internet, usluga pranja rublja i prostrano parkiralište.
 
-Imanje se nalazi u zoni očuvanih vinograda, voćnjaka i tradicionalne drvene arhitekture. Prošećite šumom, istražite okolicu na konju ili provedite popodne s djecom na igralištu i u malom zoološkom vrtu.
+Okruženi zelenilom i vinogradima Martin brega, pružamo mirno okruženje za boravak, svega nadomak Zagreba.

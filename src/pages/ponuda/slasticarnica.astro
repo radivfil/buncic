@@ -1,0 +1,35 @@
+---
+import { getEntry } from 'astro:content';
+import Osnovni from '../../layouts/Osnovni.astro';
+import Ikona from '../../components/Ikona.astro';
+import DemoOznaka from '../../components/DemoOznaka.astro';
+import Galerija from '../../components/Galerija.astro';
+
+const unos = (await getEntry('ponuda', 'slasticarnica'))!;
+const d = unos.data;
+---
+
+<Osnovni naslov={d.seoNaslov} opis={d.seoOpis} slika={d.naslovnica}>
+  <!-- UVOD: naslov i tekst, po obrascu stranice Proslave -->
+  <section class="okvir pb-12 pt-16 lg:pt-24">
+    <div data-hero>
+      <h1 class="text-5xl leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">{d.naslov}</h1>
+      <p class="mt-6 max-w-[56ch] text-lg leading-relaxed text-tekst-meki">{d.uvod}</p>
+    </div>
+  </section>
+
+  <!-- Fotografije: polje galerija u src/content/ponuda/slasticarnica.md (naslovnica = slika za dijeljenje).
+       Dok je galerija prazna, prikazuje se rezervirano mjesto TODO-slika. TODO: ostatak teksta i ponude nije dostavljen -->
+  <section class="okvir pb-24 lg:pb-32">
+    {
+      d.galerija.length > 0 ? (
+        <Galerija slike={d.galerija} id="galerija-slasticarnica" />
+      ) : (
+        <div class="flex items-center gap-5 border border-dashed border-rub/30 p-6">
+          <Ikona ime="camera-plus" velicina={36} class="shrink-0 text-naglasak" />
+          <DemoOznaka tekst="TODO-slika" />
+        </div>
+      )
+    }
+  </section>
+</Osnovni>

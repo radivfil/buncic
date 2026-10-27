@@ -1,20 +1,31 @@
 ---
 /*
-  Karta s uputama za dolazak. OpenStreetMap embed (bez kolačića za praćenje)
-  učitava se tek na klik (fasada): iframe vuče vlastite skripte i pločice koje
-  na mobitelu usporavaju prvo iscrtavanje, a ovako se ništa ne šalje OSM-u
-  bez radnje posjetitelja. Koordinate iz postavke.json (geokodirano preko OSM Nominatima).
+  Karta s uputama za dolazak. OpenStreetMap embed (ne postavlja kolačiće ni praćenje).
+  Zadano se učitava tek na klik (fasada): iframe vuče vlastite skripte i pločice koje
+  na mobitelu usporavaju prvo iscrtavanje, a ovako se ništa ne šalje OSM-u bez radnje posjetitelja.
+  S propom odmah karta je vidljiva bez klika (iframe s loading="lazy": učitava se tek kad
+  posjetitelj dođe do nje), a ispod nje su gumbi "Otvori u kartama" i "Nazovite".
+  Koordinate iz postavke.json (geokodirano preko OSM Nominatima).
 */
 import Ikona from './Ikona.astro';
+import { telHref } from '../lib/kontakt';
+import Telefon from './Telefon.astro';
 
 interface Props {
   naziv: string;
   adresa: string;
+  /** Link na kartu za adresu (lib/kontakt.ts) */
+  kartaHref: string;
+  kartaAria: string;
   koordinate: [number, number];
   upute?: string[];
+  /** Telefoni lokacije, prikazuju se kao tel: linkovi ispod uputa */
+  telefoni?: string[];
+  /** Karta odmah vidljiva (bez fasade), s gumbima ispod */
+  odmah?: boolean;
 }
 
-const { naziv, adresa, koordinate, upute = [] } = Astro.props;
+const { naziv, adresa, kartaHref, kartaAria, koordinate, upute = [], telefoni = [], odmah = false } = Astro.props;
 const [lat, lon] = koordinate;
 const d = 0.012;
 const bbox = [lon - d * 1.6, lat - d, lon + d * 1.6, lat + d].map((n) => n.toFixed(5)).join('%2C');
@@ -25,7 +36,7 @@ const google = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}
 <div class="grid gap-8 lg:grid-cols-12 lg:gap-12">
   <div class="lg:col-span-4">
     <h3 class="font-display text-3xl">{naziv}</h3>
-    <p class="mt-3 flex gap-3 text-tekst-meki"><Ikona ime="map-pin" velicina={20} class="mt-0.5 shrink-0 text-naglasak" />{adresa}</p>
+    <a href={kartaHref} target="_blank" rel="noopener noreferrer" aria-label={kartaAria} class="mt-3 flex min-h-11 items-center gap-3 text-tekst-meki hover:text-naglasak md:min-h-0 md:items-start"><Ikona ime="map-pin" velicina={20} class="shrink-0 text-naglasak md:mt-0.5" />{adresa}</a>
     {
       upute.length > 0 && (
         <ul class="mt-6 space-y-3 text-tekst-meki">
@@ -38,10 +49,48 @@ const google = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}
         </ul>
       )
     }
+    {
+      telefoni.length > 0 && (
+        <ul class="mt-4 space-y-1">
+          {telefoni.map((t) => (
+            <li>
+              <a href={telHref(t)} class="flex min-h-11 items-center gap-3 text-tekst-meki hover:text-naglasak md:min-h-0">
+                <Ikona ime="phone" velicina={18} class="shrink-0 text-naglasak" />
+                <Telefon broj={t} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
     <a href={google} target="_blank" rel="noopener" class="gumb-primarni mt-8">
       <Ikona ime="navigation-arrow" velicina={18} /> Upute za navigaciju
     </a>
   </div>
+  {
+    odmah ? (
+      <div class="min-w-0 lg:col-span-8">
+        <div class="relative aspect-[4/3] overflow-hidden bg-pozadina-2 lg:aspect-[16/9]">
+          <iframe
+            src={embed}
+            title={`Karta: ${naziv}, ${adresa}`}
+            loading="lazy"
+            referrerpolicy="no-referrer"
+            class="karta absolute inset-0 h-full w-full border-0"
+          />
+        </div>
+        <div class="mt-4 flex flex-wrap gap-3">
+          <a href={kartaHref} target="_blank" rel="noopener noreferrer" aria-label={kartaAria} class="gumb-obrub text-naglasak">
+            <Ikona ime="map-pin" velicina={18} /> Otvori u kartama
+          </a>
+          {telefoni[0] && (
+            <a href={telHref(telefoni[0])} class="gumb-primarni" data-nazovite-sidro>
+              <Ikona ime="phone" velicina={18} /> Nazovite
+            </a>
+          )}
+        </div>
+      </div>
+    ) : (
   <div class="karta-okvir relative aspect-[4/3] overflow-hidden bg-pozadina-2 lg:col-span-8 lg:aspect-[16/9]" data-karta={embed} data-naslov={`Karta: ${naziv}, ${adresa}`}>
     <button type="button" class="karta-fasada group absolute inset-0 flex w-full flex-col items-center justify-center gap-4 p-6 text-center" data-karta-gumb>
       <span class="grid size-16 place-items-center rounded-full bg-pozadina text-naglasak shadow-sm transition-transform duration-300 ease-out-soft group-hover:-translate-y-0.5">
@@ -51,6 +100,8 @@ const google = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}
       <span class="max-w-[36ch] text-sm text-tekst-meki">Karta se učitava s OpenStreetMap.org</span>
     </button>
   </div>
+    )
+  }
 </div>
 
 <script>

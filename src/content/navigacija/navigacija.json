@@ -1,0 +1,42 @@
+[
+  {
+    "id": "ponuda",
+    "glavna": [
+      {
+        "tekst": "Početna",
+        "href": "/"
+      },
+      {
+        "tekst": "Ponuda",
+        "izbornik": true
+      },
+      {
+        "tekst": "Novosti i događanja",
+        "href": "/novosti"
+      },
+      {
+        "tekst": "Ribarska koliba",
+        "href": "/ponuda/ribarska-koliba"
+      }
+    ],
+    "stranice": [
+      "vjencanja",
+      "proslave",
+      "restoran",
+      "smjestaj",
+      "catering",
+      "izleti-u-prirodi",
+      "slasticarnica"
+    ],
+    "podnozjeDodatno": [
+      {
+        "tekst": "Novosti i događanja",
+        "href": "/novosti"
+      },
+      {
+        "tekst": "Ribarska koliba",
+        "href": "/ponuda/ribarska-koliba"
+      }
+    ]
+  }
+]

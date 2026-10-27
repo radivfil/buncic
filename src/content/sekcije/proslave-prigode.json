@@ -1,0 +1,25 @@
+{
+  "naslov": "Svaka prigoda zaslužuje posebno slavlje",
+  "stavke": [
+    {
+      "ikona": "baby",
+      "naslov": "Krštenja",
+      "opis": "Obiteljska okupljanja uz svečani ručak i ugodnu atmosferu."
+    },
+    {
+      "ikona": "church",
+      "naslov": "Pričesti i krizme",
+      "opis": "Za svečani ručak odaberite jedan od naših jelovnika ili bogati švedski stol."
+    },
+    {
+      "ikona": "cake",
+      "naslov": "Rođendani i godišnjice",
+      "opis": "Od intimnih obiteljskih slavlja do velikih rođendanskih proslava."
+    },
+    {
+      "ikona": "users-three",
+      "naslov": "Domjenci i poslovni događaji",
+      "opis": "Poslovni domjenci, proslave kolektiva i team building"
+    }
+  ]
+}

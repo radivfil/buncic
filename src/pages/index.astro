@@ -4,50 +4,45 @@ import { getCollection, getEntry } from 'astro:content';
 import Osnovni from '../layouts/Osnovni.astro';
 import Ikona from '../components/Ikona.astro';
 import KarticaNovosti from '../components/KarticaNovosti.astro';
+import RedakRadnogVremena from '../components/RedakRadnogVremena.astro';
+import { glavnoRadnoVrijeme, shemaRadnogVremena } from '../lib/radnoVrijeme';
+import { formatTelefona, kartaAria, kartaHref, telHref } from '../lib/kontakt';
+import Telefon from '../components/Telefon.astro';
 
-// ZAMIJENITI PRIJE LAUNCHA: sve fotografije na početnoj su snimke mobitelom; hero ima samo 960 px (vidi FOTOGRAFIJE.md)
-import hero from '../assets/images/pocetna/hero-mladenci-sjenica.jpg';
-import zgrada from '../assets/images/pocetna/klet-zgrada.jpg';
-import imanje from '../assets/images/imanje/panorama.jpg';
-import park from '../assets/images/imanje/bunar-sjenica.jpg';
+import { slika } from '../lib/slike';
+import { preview } from '../siteMode.mjs';
+// Fotografije naslovnice: src/content/slike/slike.json (ZAMIJENITI PRIJE LAUNCHA: snimke mobitelom, vidi FOTOGRAFIJE.md)
+const [hero, zgrada, park, imanje] = await Promise.all(['pocetna-hero', 'pocetna-zgrada', 'pocetna-park', 'pocetna-imanje'].map(slika));
 
 const postavke = (await getEntry('postavke', 'opce'))!.data;
+// Tekstovi naslovnice: src/content/stranice/pocetna.json
+const t = (await getEntry('stranicaPocetna', 'pocetna'))!.data;
 const ponuda = (await getCollection('ponuda')).sort((a, b) => a.data.redoslijed - b.data.redoslijed);
 const p = Object.fromEntries(ponuda.map((e) => [e.id, e]));
 const novosti = (await getCollection('novosti')).sort((a, b) => +b.data.datum - +a.data.datum).slice(0, 3);
 
-const godisnjiRitam = [
-  { kada: 'Siječanj', naslov: 'Vincekovo', opis: 'Blagoslov vinograda i prvi veliki blagdan u godini.' },
-  { kada: 'Svake nedjelje', naslov: 'Nedjeljni ručak', opis: 'Švedski stol, dvije juhe na izbor i tamburaši za stolom.' },
-  { kada: 'Petkom i subotom', naslov: 'Živa glazba', opis: 'Domaća zabavna glazba i ples uz naše prateće bendove.' },
-  { kada: 'Rujan', naslov: 'Berba', opis: 'Vrijeme kad se imanje najviše veseli, u vinogradu i za stolom.' },
-  { kada: 'Studeni', naslov: 'Martinje', opis: 'Tradicionalno krštenje mošta, uz jela koja idu uz mlado vino.' },
-  { kada: 'Prosinac', naslov: 'Domjenci i doček', opis: 'Božićni domjenci za tvrtke i doček Nove godine u Kleti.' },
-];
 
 const shema = {
   '@context': 'https://schema.org',
   '@type': ['Restaurant', 'LodgingBusiness'],
   name: 'Klet obitelji Bunčić',
   alternateName: 'Obitelj Bunčić',
-  url: 'https://buncic.hr',
-  logo: 'https://buncic.hr/logo.svg',
-  telephone: '+38512781133',
+  // Adrese na produkcijsku domenu samo u produkciji (src/siteMode.mjs)
+  ...(!preview && { url: 'https://buncic.hr', logo: 'https://buncic.hr/logo.svg' }),
+  telephone: formatTelefona(postavke.lokacije[0].telefoni[0], { nbsp: false }),
   email: postavke.email,
   foundingDate: '1994',
   servesCuisine: ['Domaća kuhinja', 'Lovački specijaliteti', 'Jela ispod peke'],
   numberOfRooms: 40,
+  sameAs: postavke.drustveneMreze.map((m) => m.url),
   address: {
     '@type': 'PostalAddress',
-    streetAddress: 'Šaškovečka 182',
+    streetAddress: 'Šaškovečka ulica 182',
     postalCode: '10370',
     addressLocality: 'Dugo Selo',
     addressCountry: 'HR',
   },
-  openingHoursSpecification: [
-    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'], opens: '07:00', closes: '23:00' },
-    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Friday', 'Saturday'], opens: '07:00', closes: '04:00' },
-  ],
+  openingHoursSpecification: shemaRadnogVremena(postavke.lokacije[0]),
 };
 ---
 
@@ -61,10 +56,10 @@ const shema = {
   <section class="relative isolate flex min-h-[100dvh] items-end overflow-hidden bg-podrum text-krem">
     <div class="absolute inset-0 -z-10" data-hero-slika>
       <Picture
-        src={hero}
-        alt="Mladenci u zagrljaju ispred drvene sjenice, iza njih vinograd Martin brega"
+        src={hero.slika}
+        alt={hero.alt}
         formats={['avif', 'webp']}
-        widths={[640, 960]}
+        widths={[640, 960, 1280, 1920, 2560]}
         sizes="100vw"
         loading="eager"
         fetchpriority="high"
@@ -75,12 +70,12 @@ const shema = {
     <div class="absolute inset-0 -z-10 bg-gradient-to-r from-podrum/60 via-transparent to-transparent max-md:bg-none max-md:bg-podrum/35"></div>
 
     <div class="okvir pb-16 pt-32 md:pb-20 lg:pb-24" data-hero>
-      <p class="text-sm font-medium uppercase tracking-[0.2em] text-zlato">Klet Bunčić, Dugo Selo. Od 1994.</p>
+      <p class="text-sm font-medium uppercase tracking-[0.2em] text-zlato">{t.hero.nadnaslov}</p>
       <h1 class="mt-5 max-w-[16ch] text-[2.75rem] leading-[1.05] tracking-tight xs:text-5xl md:text-6xl lg:text-7xl">
-        Vaši najvažniji dani, <em class="font-normal italic text-zlato-300">u našem domu.</em>
+        {t.hero.naslov} <em class="font-normal italic text-zlato-300">{t.hero.naslovIstaknuto}</em>
       </h1>
       <p class="mt-6 max-w-[46ch] text-lg leading-relaxed text-krem/90 md:text-xl">
-        Vjenčanja, proslave i domaća kuhinja na obiteljskom imanju usred vinograda Martin brega, nadomak Zagreba.
+        {t.hero.podnaslov}
       </p>
       <div class="mt-9 flex flex-wrap gap-3">
         <a href="/kontakt" class="gumb-svijetli">Pošaljite upit</a>
@@ -93,31 +88,28 @@ const shema = {
   <section class="okvir grid items-center gap-12 py-24 md:grid-cols-12 md:gap-10 lg:py-32">
     <div class="md:col-span-7 lg:col-span-6 lg:col-start-1" data-reveal-grupa>
       <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>
-        Više od trideset godina toplog obiteljskog gostoprimstva.
+        {t.uvod.naslov}
       </h2>
       <p class="mt-8 max-w-[58ch] text-lg leading-relaxed text-tekst-meki" data-reveal>
-        Od 1994. godine, kada smo otvorili obiteljsko imanje, gostima nudimo toplu dobrodošlicu. Kod nas ćete uživati u jednostavnosti darova prirode i opustiti se kao da ste stotinama kilometara od gradske vreve, a opet nadomak Zagreba.
+        {t.uvod.tekst}
       </p>
+      <!-- TODO: vlasnik još nije odlučio o brojkama (vidi uvod.napomena u pocetna.json) -->
       <dl class="mt-12 grid max-w-xl grid-cols-3 gap-6 tabular-nums border-t border-rub/15 pt-8" data-reveal>
-        <div>
-          <dt class="text-sm text-tekst-meki">Otvoreno od</dt>
-          <dd class="mt-1 font-display text-4xl text-naglasak md:text-5xl">1994.</dd>
-        </div>
-        <div>
-          <dt class="text-sm text-tekst-meki">Soba za goste</dt>
-          <dd class="mt-1 font-display text-4xl text-naglasak md:text-5xl">40</dd>
-        </div>
-        <div>
-          <dt class="text-sm text-tekst-meki">Lokacije</dt>
-          <dd class="mt-1 font-display text-4xl text-naglasak md:text-5xl">2</dd>
-        </div>
+        {
+          t.uvod.brojke.map((b) => (
+            <div>
+              <dt class="text-sm text-tekst-meki">{b.oznaka}</dt>
+              <dd class="mt-1 font-display text-4xl text-naglasak md:text-5xl">{b.vrijednost}</dd>
+            </div>
+          ))
+        }
       </dl>
     </div>
     <div class="relative md:col-span-5 lg:col-span-5 lg:col-start-8">
       <div class="luk relative aspect-[4/5] overflow-hidden bg-pozadina-2" data-reveal="fade">
         <Picture
-          src={zgrada}
-          alt="Pročelje Kleti obitelji Bunčić od crvene opeke s drvenim balkonima"
+          src={zgrada.slika}
+          alt={zgrada.alt}
           formats={['avif', 'webp']}
           widths={[480, 800, 1200]}
           sizes="(min-width: 768px) 40vw, 100vw"
@@ -126,8 +118,8 @@ const shema = {
       </div>
       <div class="absolute -bottom-10 -left-6 hidden w-[46%] border-8 border-pozadina md:block lg:-left-16" data-reveal>
         <Picture
-          src={park}
-          alt="Drvena sjenica s bunarom i cvijećem ispred Kleti"
+          src={park.slika}
+          alt={park.alt}
           formats={['avif', 'webp']}
           widths={[400, 640]}
           sizes="20vw"
@@ -137,21 +129,23 @@ const shema = {
     </div>
   </section>
 
-  <!-- PONUDA: bento s različitim veličinama ćelija, 6 stavki = 6 ćelija -->
+  <!-- PONUDA: bento s različitim veličinama ćelija, 7 stavki = 7 ćelija.
+       Visine redaka su minimalne (minmax), ne fiksne: kartica raste s tekstom umjesto da ga reže.
+       lg (1024-1279): Proslave/Smještaj i Slastičarnica/Izleti u parovima; xl: sve četiri u jednom redu. -->
   <section id="ponuda" class="bg-pozadina-2/60 py-24 lg:py-32">
     <div class="okvir">
       <h2 class="max-w-[20ch] text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>
         Sve što trebate za dan koji se pamti
       </h2>
 
-      <div class="mt-14 grid grid-cols-1 gap-4 md:grid-cols-6 lg:grid-cols-12 lg:grid-rows-[300px_300px_280px]" data-reveal-grupa>
+      <div class="mt-14 grid grid-cols-1 gap-4 md:grid-cols-6 lg:grid-cols-12 lg:grid-rows-[minmax(300px,auto)_minmax(300px,auto)] lg:auto-rows-[minmax(280px,auto)]" data-reveal-grupa>
         {
           [
             { id: 'vjencanja', klasa: 'md:col-span-6 lg:col-span-7 lg:row-span-2 min-h-[420px]' },
             { id: 'restoran', klasa: 'md:col-span-3 lg:col-span-5 min-h-[300px]' },
             { id: 'catering', klasa: 'md:col-span-3 lg:col-span-5 min-h-[300px]' },
-            { id: 'proslave', klasa: 'md:col-span-3 lg:col-span-5 min-h-[280px]' },
-            { id: 'smjestaj', klasa: 'md:col-span-3 lg:col-span-4 min-h-[280px]' },
+            { id: 'proslave', klasa: 'md:col-span-3 lg:col-span-6 xl:col-span-3 min-h-[280px]' },
+            { id: 'smjestaj', klasa: 'md:col-span-3 lg:col-span-6 xl:col-span-3 min-h-[280px]' },
           ].map(({ id, klasa }) => (
             <a
               href={`/ponuda/${id}`}
@@ -170,33 +164,40 @@ const shema = {
                 />
               </div>
               <div class="absolute inset-0 -z-10 bg-gradient-to-t from-podrum/90 via-podrum/30 to-transparent" />
-              <h3 class:list={['font-display leading-tight', id === 'vjencanja' ? 'text-4xl md:text-5xl' : 'text-3xl']}>
+              <h3 class:list={['font-display leading-tight break-words', id === 'vjencanja' ? 'text-4xl md:text-5xl' : 'text-3xl']}>
                 {p[id].data.nazivIzbornik}
               </h3>
-              <p class="mt-2 flex items-center gap-2 text-krem/90">
-                {p[id].data.opisIzbornik}
-                <span data-kartica-strelica class="inline-flex">
+              <p class="mt-2 flex items-center gap-2 break-words text-krem/90">
+                <span class="min-w-0">{p[id].data.opisIzbornik}</span>
+                <span data-kartica-strelica class="inline-flex shrink-0">
                   <Ikona ime="arrow-right" velicina={18} />
                 </span>
               </p>
             </a>
           ))
         }
-        <a
-          href="/ponuda/ribarska-koliba"
-          class="group relative flex min-h-[280px] flex-col justify-between bg-bordo p-6 text-krem md:col-span-6 md:p-8 lg:col-span-3"
-          data-kartica
-          data-reveal
-        >
-          <Ikona ime="fish-simple" velicina={40} class="text-zlato" />
-          <div>
-            <h3 class="font-display text-3xl leading-tight">Ribarska koliba</h3>
-            <p class="mt-2 flex items-center gap-2 text-krem/90">
-              Rugvička ulica 217
-              <span data-kartica-strelica class="inline-flex"><Ikona ime="arrow-right" velicina={18} /></span>
-            </p>
-          </div>
-        </a>
+        {
+          [
+            { id: 'slasticarnica', ikona: 'cake' },
+            { id: 'izleti-u-prirodi', ikona: 'tree' },
+          ].map(({ id, ikona }) => (
+            <a
+              href={`/ponuda/${id}`}
+              class="group relative flex min-h-[280px] flex-col justify-between bg-bordo p-6 text-krem md:col-span-3 md:p-8 lg:col-span-6 xl:col-span-3"
+              data-kartica
+              data-reveal
+            >
+              <Ikona ime={ikona} velicina={40} class="text-zlato" />
+              <div>
+                <h3 class="font-display text-3xl leading-tight break-words">{p[id].data.nazivIzbornik}</h3>
+                <p class="mt-2 flex items-center gap-2 break-words text-krem/90">
+                  <span class="min-w-0">{p[id].data.opisIzbornik}</span>
+                  <span data-kartica-strelica class="inline-flex shrink-0"><Ikona ime="arrow-right" velicina={18} /></span>
+                </p>
+              </div>
+            </a>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -222,16 +223,16 @@ const shema = {
   <section class="py-24 lg:py-32" aria-labelledby="godina-naslov">
     <div class="okvir">
       <h2 id="godina-naslov" class="max-w-[22ch] text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>
-        Imanje kroz godinu
+        {t.godina.naslov}
       </h2>
       <p class="mt-5 max-w-[52ch] text-lg leading-relaxed text-tekst-meki" data-reveal>
-        Blagdane i vinske običaje slavimo velikim proslavama. Pridružite nam se.
+        {t.godina.podnaslov}
       </p>
     </div>
     <div class="mt-12 overflow-x-auto overscroll-x-contain [scrollbar-width:thin]" tabindex="0" aria-label="Događanja kroz godinu, pomičite vodoravno">
       <ol class="okvir flex snap-x snap-mandatory gap-4 pb-4" data-reveal-grupa>
         {
-          godisnjiRitam.map((d) => (
+          t.godina.dogadanja.map((d) => (
             <li class="w-[78vw] max-w-[320px] shrink-0 snap-start border-t-2 border-naglasak bg-pozadina-2/70 p-7 xs:w-[280px]" data-reveal>
               <p class="text-sm font-medium text-naglasak">{d.kada}</p>
               <h3 class="mt-6 font-display text-2xl">{d.naslov}</h3>
@@ -247,8 +248,8 @@ const shema = {
   <section class="relative isolate overflow-hidden">
     <div class="absolute inset-0 -z-10">
       <Picture
-        src={imanje}
-        alt="Imanje s crvenim krovovima na brijegu, okruženo vinogradima i drvećem"
+        src={imanje.slika}
+        alt={imanje.alt}
         formats={['avif', 'webp']}
         widths={[640, 1200, 1920]}
         sizes="100vw"
@@ -258,13 +259,12 @@ const shema = {
     <div class="absolute inset-0 -z-10 bg-podrum/45 md:bg-gradient-to-r md:from-podrum/10 md:via-podrum/10 md:to-podrum/70"></div>
     <div class="okvir flex min-h-[560px] items-center py-20 md:justify-end lg:min-h-[640px]">
       <div class="max-w-md bg-pozadina p-8 md:p-10" data-reveal>
-        <h2 class="text-3xl leading-tight tracking-tight md:text-4xl">Nadomak Zagreba, a daleko od gradske vreve</h2>
+        <h2 class="text-3xl leading-tight tracking-tight md:text-4xl">{t.priroda.naslov}</h2>
         <p class="mt-5 leading-relaxed text-tekst-meki">
-          Prošećite šumom, istražite okolicu na konju ili provedite popodne s djecom na igralištu i u malom zoološkom
-          vrtu. Za one koji ostaju duže, tu je 40 soba.
+          {t.priroda.tekst}
         </p>
-        <a href="/ponuda/smjestaj" class="poveznica mt-7 text-naglasak">
-          Smještaj na imanju <Ikona ime="arrow-right" velicina={18} />
+        <a href={t.priroda.poveznica.href} class="poveznica mt-7 text-naglasak">
+          {t.priroda.poveznica.tekst} <Ikona ime="arrow-right" velicina={18} />
         </a>
       </div>
     </div>
@@ -290,27 +290,28 @@ const shema = {
   <section class="na-tamnom bg-bordo-900 text-krem">
     <div class="okvir grid gap-12 py-20 md:grid-cols-2 lg:py-28">
       <div data-reveal>
-        <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl">Dođite nas upoznati</h2>
+        <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl">{t.dolazak.naslov}</h2>
         <p class="mt-6 max-w-[44ch] text-lg leading-relaxed text-krem/85">
-          Nazovite nas ili pošaljite upit. Rado ćemo vam pokazati dvorane i imanje prije nego što odlučite.
+          {t.dolazak.tekst}
         </p>
         <div class="mt-9 flex flex-wrap gap-3">
           <a href="/kontakt" class="gumb-svijetli">Pošaljite upit</a>
-          <a href="tel:+38512781133" class="gumb-obrub-svijetli"><Ikona ime="phone" velicina={18} /> 01 2781-133</a>
+          <a href={telHref(postavke.lokacije[0].telefoni[0])} class="gumb-obrub-svijetli"><Ikona ime="phone" velicina={18} /> <Telefon broj={postavke.lokacije[0].telefoni[0]} /></a>
         </div>
       </div>
-      <dl class="grid gap-8 self-end sm:grid-cols-2" data-reveal>
+      <!-- Stavke se slažu jedna uz drugu dok ima mjesta, inače jedna ispod druge (bez preklapanja) -->
+      <dl class="flex flex-wrap gap-x-12 gap-y-8 self-end" data-reveal>
         <div>
           <dt class="font-display text-xl text-zlato">Adresa</dt>
           <dd class="mt-2 leading-relaxed text-krem/85">
-            {postavke.lokacije[0].adresa}<br />
-            <a href={postavke.kartaUrl} target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-krem">Otvori u Google kartama</a>
+            <a href={kartaHref(postavke.lokacije[0])} target="_blank" rel="noopener noreferrer" aria-label={kartaAria(postavke.lokacije[0])} class="hover:text-krem">{postavke.lokacije[0].adresa}</a><br />
+            <a href={kartaHref(postavke.lokacije[0])} target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-krem">Otvori u Google kartama</a>
           </dd>
         </div>
         <div>
           <dt class="font-display text-xl text-zlato">Radno vrijeme</dt>
           <dd class="mt-2 leading-relaxed text-krem/85">
-            {postavke.lokacije[0].radnoVrijeme.slice(0, 2).map((r) => <span class="block">{r}</span>)}
+            <span class="block"><RedakRadnogVremena r={glavnoRadnoVrijeme(postavke.lokacije[0])} /></span>
           </dd>
         </div>
       </dl>

@@ -9,4 +9,4 @@ kategorija: Blagdani
 
 Dočekajte nadolazeću godinu u toplom, svečanom ambijentu i veseloj atmosferi našeg imanja uz vrhunski svečani meni.
 
-Broj mjesta je ograničen. Rezervacije primamo na 01 2781-133.
+Broj mjesta je ograničen. Rezervacije primamo na [+385 1 2781-133](tel:+38512781133).

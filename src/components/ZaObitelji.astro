@@ -1,0 +1,29 @@
+---
+/*
+  Sekcija "Za obitelji, vrtiće i škole" (preseljena sa stranice Smještaj, faza 1b).
+  Sadržaj: src/content/sekcije/za-obitelji.json. Uklanja se brisanjem importa na stranici.
+*/
+import { getEntry } from 'astro:content';
+import FotoTraka from './FotoTraka.astro';
+import Ikona from './Ikona.astro';
+
+// ZAMIJENITI PRIJE LAUNCHA: arhivska fotografija (mobitel)
+const s = (await getEntry('sekcije', 'za-obitelji'))!.data;
+---
+
+<FotoTraka slika={s.slika!} alt={s.alt!} poravnanje="lijevo" visina="min-h-[85dvh]">
+  <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl">{s.naslov}</h2>
+  <ul class="mt-8 space-y-6">
+    {
+      s.stavke.map((z) => (
+        <li class="flex gap-4">
+          <Ikona ime={z.ikona!} velicina={28} class="mt-1 shrink-0 text-zlato" />
+          <div>
+            <h3 class="font-display text-2xl">{z.naslov}</h3>
+            <p class="mt-1 leading-relaxed text-krem/85">{z.opis}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</FotoTraka>

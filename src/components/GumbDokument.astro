@@ -1,0 +1,33 @@
+---
+/*
+  Gumb za otvaranje dokumenta (PDF jelovnik, brošura) u novoj kartici.
+  Podaci: src/content/dokumenti/dokumenti.json (lib/dokumenti.ts dodaje veličinu datoteke).
+  Samo poveznica: PDF se ne ugrađuje, ne učitava unaprijed i ne ulazi u JS, pa ne usporava stranicu.
+  varijanta "obrub" za svijetle stranice, "obrub-svijetli" preko fotografije ili tamne podloge.
+*/
+import Ikona from './Ikona.astro';
+
+interface Props {
+  dokument: { putanja: string; tekstGumba: string; naziv: string; velicina: string };
+  varijanta?: 'obrub' | 'obrub-svijetli';
+  class?: string;
+}
+
+const { dokument, varijanta = 'obrub', class: klasa = '' } = Astro.props;
+// Ako tekst gumba već sadrži "(PDF)", uz njega ide samo veličina; inače "PDF, 10,7 MB"
+const imaPdf = /\(PDF\)/.test(dokument.tekstGumba);
+const oznaka = imaPdf ? dokument.velicina : `PDF, ${dokument.velicina}`;
+const tekst = dokument.tekstGumba.replace(/\s*\(PDF\)$/, '');
+---
+
+<a
+  href={dokument.putanja}
+  target="_blank"
+  rel="noopener noreferrer"
+  class:list={[varijanta === 'obrub' ? 'gumb-obrub' : 'gumb-obrub-svijetli', 'max-w-full whitespace-normal px-4 py-2 sm:px-6', klasa]}
+  aria-label={`${tekst}: ${dokument.naziv} (PDF, ${dokument.velicina}), otvara se u novoj kartici`}
+>
+  <Ikona ime="file-pdf" velicina={20} />
+  {dokument.tekstGumba}
+  <span class="whitespace-nowrap text-sm font-normal opacity-75">{oznaka}</span>
+</a>

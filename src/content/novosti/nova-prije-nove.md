@@ -9,4 +9,4 @@ kategorija: Događanja
 
 Dočekajte blagdane malo ranije. Božićnu večer Nova prije Nove provodimo uz band Slobodno vrijeme, domaću kuhinju i poznatu atmosferu Kleti.
 
-Za rezervaciju stola nazovite nas na 01 2781-133.
+Za rezervaciju stola nazovite nas na [+385 1 2781-133](tel:+38512781133).

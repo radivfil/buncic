@@ -3,12 +3,17 @@
   Vizualni placeholder za AI chatbot. Sučelje je gotovo; za spajanje na backend
   zamijeni funkciju posaljiPoruku() u skripti ispod (npr. fetch na /api/chat).
 */
+import { getEntry } from 'astro:content';
 import Ikona from './Ikona.astro';
+import { formatTelefona } from '../lib/kontakt';
+
+// Broj u poruci asistenta: glavni broj Kleti iz postavke.json, u jedinstvenom obliku
+const telefon = formatTelefona((await getEntry('postavke', 'opce'))!.data.lokacije[0].telefoni[0]);
 
 const brzaPitanja = ['Imate li slobodan termin za vjenčanje?', 'Kolika je cijena noćenja?', 'Radno vrijeme restorana'];
 ---
 
-<div id="chatbot" class="chatbot fixed bottom-4 right-4 z-[44] sm:bottom-6 sm:right-6">
+<div id="chatbot" class="chatbot fixed bottom-4 right-4 z-[44] sm:bottom-6 sm:right-6" data-telefon={telefon}>
   <div
     id="chat-prozor"
     class="absolute bottom-[4.5rem] right-0 flex h-[min(560px,calc(100dvh-7rem))] w-[min(380px,calc(100vw-2rem))] origin-bottom-right flex-col border border-rub/15 bg-pozadina text-tekst shadow-[0_30px_80px_-24px_rgba(61,28,18,0.5)]"
@@ -140,7 +145,7 @@ const brzaPitanja = ['Imate li slobodan termin za vjenčanje?', 'Kolika je cijen
     dodaj(tekst, 'gost');
     await new Promise((r) => setTimeout(r, 700));
     dodaj(
-      'Asistent je trenutno u pripremi. Za brzi odgovor nazovite nas na 01 2781-133 ili pošaljite upit preko stranice Kontakt.',
+      `Asistent je trenutno u pripremi. Za brzi odgovor nazovite nas na ${document.getElementById('chatbot')!.dataset.telefon} ili pošaljite upit preko stranice Kontakt.`,
       'bot',
     );
   };

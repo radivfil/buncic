@@ -1,0 +1,78 @@
+[
+  {
+    "id": "pocetna",
+    "hero": {
+      "nadnaslov": "Klet obitelji Bunčić, Dugo Selo",
+      "naslov": "Za vaše najvažnije trenutke,",
+      "naslovIstaknuto": "već generacijama.",
+      "podnaslov": "Vjenčanja, proslave i domaća kuhinja na obiteljskom imanju usred vinograda Martin brega, nadomak Zagreba."
+    },
+    "uvod": {
+      "naslov": "Dobro došli u Klet obitelji Bunčić!",
+      "tekst": "Na obroncima Martin brega, među vinogradima i zelenilom, smjestila se naša Klet. Već više od tri desetljeća naše obiteljsko imanje pruža gostima toplu dobrodošlicu, nadaleko poznatu gostoljubivost i bogatu gastronomsku ponudu. U mirnom okruženju prirode, nadomak Zagreba, njegujemo tradiciju i stvaramo mjesto ugodnih druženja i svečanih slavlja.",
+      "brojke": [
+        {
+          "oznaka": "Otvoreno od",
+          "vrijednost": "1994."
+        },
+        {
+          "oznaka": "Soba za goste",
+          "vrijednost": "40"
+        },
+        {
+          "oznaka": "Lokacije",
+          "vrijednost": "2"
+        }
+      ],
+      "napomena": "TODO: vlasnik još nije odlučio o brojkama (Otvoreno od / Soba za goste / Lokacije); vrijednosti namjerno nisu mijenjane"
+    },
+    "godina": {
+      "naslov": "Klet kroz godinu",
+      "podnaslov": "Od tradicionalnih vinskih običaja i blagdanskih slavlja do nedjeljnih druženja uz domaću kuhinju i živu glazbu. Otkrijte događanja koja tijekom cijele godine okupljaju goste naše Kleti.",
+      "dogadanja": [
+        {
+          "kada": "Siječanj",
+          "naslov": "Od kotla do stola",
+          "opis": "Oživljavamo stare običaje i tradiciju pripreme domaćih delicija."
+        },
+        {
+          "kada": "Svake nedjelje",
+          "naslov": "Nedjeljni ručak",
+          "opis": "Tradicionalni švedski stol uz bogat izbor domaćih jela"
+        },
+        {
+          "kada": "Veljača i Ožujak",
+          "naslov": "Valentinovo i Dan žena",
+          "opis": "Slavimo ljubav i žene uz dobru hranu i veselu atmosferu."
+        },
+        {
+          "kada": "Kroz korizmu",
+          "naslov": "Riblje večeri",
+          "opis": "Bogati riblji švedski stol uz živu glazbu svakog petka tijekom korizme."
+        },
+        {
+          "kada": "Studeni",
+          "naslov": "Martinje",
+          "opis": "Krštenje mošta, martinski specijaliteti i veselje uz živu glazbu."
+        },
+        {
+          "kada": "Prosinac",
+          "naslov": "Domjenci i doček",
+          "opis": "Od božićnih domjenaka i blagdanskih druženja do svečanog dočeka Nove godine"
+        }
+      ]
+    },
+    "priroda": {
+      "naslov": "Nadomak Zagreba, a daleko od gradske vreve",
+      "tekst": "Među vinogradima i zelenilom Martin brega očekuje vas prostrano imanje idealno za druženje i boravak u prirodi. Dok odrasli uživaju u mirnom okruženju, najmlađi mogu istraživati dječje igralište i upoznati domaće životinje.",
+      "poveznica": {
+        "tekst": "Izleti u prirodi",
+        "href": "/ponuda/izleti-u-prirodi"
+      }
+    },
+    "dolazak": {
+      "naslov": "Dođite nas upoznati",
+      "tekst": "Za sve informacije, dogovore i rezervacije stojimo vam na raspolaganju. Veselimo se vašem dolasku!"
+    }
+  }
+]

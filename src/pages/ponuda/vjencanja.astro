@@ -10,34 +10,21 @@ import Paketi from '../../components/Paketi.astro';
 import Recenzije from '../../components/Recenzije.astro';
 import CestaPitanja from '../../components/CestaPitanja.astro';
 import FotoTraka from '../../components/FotoTraka.astro';
+import GumbDokument from '../../components/GumbDokument.astro';
+import { dokumentiStranice } from '../../lib/dokumenti';
 
-import stablo from '../../assets/images/vjencanja/cvjetno-stablo.jpg';
-import vatromet from '../../assets/images/vjencanja/vatromet-ples.jpg';
-// ZAMIJENITI PRIJE LAUNCHA: fotografija dvorane snimljena mobitelom (arhiva buncic.hr)
-import dvoranaSvijece from '../../assets/images/dvorane/svijecnjaci.jpg';
+import { slika } from '../../lib/slike';
+// Pojedinačne fotografije stranice: src/content/slike/slike.json
+const [stablo, vatromet, dvoranaSvijece] = await Promise.all(['vjencanja-stablo', 'vjencanja-vatromet', 'vjencanja-dvorana'].map(slika));
 
 const unos = (await getEntry('ponuda', 'vjencanja'))!;
 const { Content } = await render(unos);
 const d = unos.data;
+// Tekstovi stranice: src/content/stranice/vjencanja.json
+const t = (await getEntry('stranicaVjencanja', 'vjencanja'))!.data;
 
-// Grupirano u tri cjeline umjesto dugog popisa
-const ukljuceno = [
-  {
-    naslov: 'Za stolom',
-    ikona: 'bowl-steam',
-    stavke: ['Svadbeni meni po domaćim recepturama', 'Torte i kolači naših slastičara', 'Slatki švedski stol ili posluživanje za stolom'],
-  },
-  {
-    naslov: 'Dekoracija',
-    ikona: 'flower-tulip',
-    stavke: ['Kompletna dekoracija dvorane po želji', 'Mladenački buket, kitice i reveri', 'Dekoracija automobila i crkve'],
-  },
-  {
-    naslov: 'Za vas i goste',
-    ikona: 'users-three',
-    stavke: ['Više dvorana prema broju uzvanika', 'Obred vjenčanja na otvorenom', 'Smještaj za goste i osiguran parking', 'Izrada pozivnica i zahvalnica'],
-  },
-];
+// Brošura (PDF): src/content/dokumenti/dokumenti.json (stranica: vjencanja)
+const brosure = await dokumentiStranice('vjencanja');
 ---
 
 <Osnovni naslov={d.seoNaslov} opis={d.seoOpis} slika={d.naslovnica} zaglavljePreko>
@@ -48,7 +35,7 @@ const ukljuceno = [
         src={d.naslovnica!}
         alt={d.naslovnicaAlt!}
         formats={['avif', 'webp']}
-        widths={[640, 960]}
+        widths={[640, 960, 1280, 1920, 2560]}
         sizes="100vw"
         loading="eager"
         fetchpriority="high"
@@ -59,13 +46,11 @@ const ukljuceno = [
     <div class="okvir pb-16 pt-32 lg:pb-24" data-hero>
       <h1 class="text-6xl leading-none tracking-tight md:text-7xl lg:text-8xl">Vjenčanja</h1>
       <p class="mt-6 max-w-[44ch] text-lg leading-relaxed text-krem/90 md:text-xl">
-        Obred u voćnjaku, večera u dvorani i ples do jutra. Sve na jednom imanju, uz jedan tim.
+        {t.heroPodnaslov}
       </p>
       <div class="mt-9 flex flex-wrap gap-3">
         <a href="#upit" class="gumb-svijetli">Provjerite termin</a>
-        <a href="/dokumenti/brosura-vjencanja.pdf" class="gumb-obrub-svijetli" download>
-          <Ikona ime="file-pdf" velicina={20} /> Brošura (PDF)
-        </a>
+        {brosure.map((dok) => <GumbDokument dokument={dok} varijanta="obrub-svijetli" />)}
       </div>
     </div>
   </section>
@@ -83,8 +68,8 @@ const ukljuceno = [
     <div class="md:col-span-5 lg:col-span-5 lg:col-start-8" data-reveal="fade">
       <div class="luk aspect-[3/4] overflow-hidden">
         <Picture
-          src={stablo}
-          alt="Dekorativno stablo s bijelim cvjetovima uz zid od opeke"
+          src={stablo.slika}
+          alt={stablo.alt}
           formats={['avif', 'webp']}
           widths={[480, 800, 1200]}
           sizes="(min-width: 768px) 40vw, 100vw"
@@ -102,11 +87,11 @@ const ukljuceno = [
     <div class="okvir grid gap-12 lg:grid-cols-12 lg:gap-16">
       <div class="lg:col-span-5">
         <div class="lg:sticky lg:top-28">
-          <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>Sve za vaš dan, na jednom mjestu</h2>
+          <h2 class="text-4xl leading-[1.1] tracking-tight md:text-5xl" data-reveal>{t.ukljuceno.naslov}</h2>
           <div class="mt-10 hidden aspect-[4/3] overflow-hidden lg:block" data-reveal="fade">
             <Picture
-              src={vatromet}
-              alt="Hladni vatromet i para na plesnom podiju tijekom prvog plesa"
+              src={vatromet.slika}
+              alt={vatromet.alt}
               formats={['avif', 'webp']}
               widths={[640, 960]}
               sizes="40vw"
@@ -117,7 +102,7 @@ const ukljuceno = [
       </div>
       <div class="flex flex-col gap-12 lg:col-span-6 lg:col-start-7" data-reveal-grupa>
         {
-          ukljuceno.map((g) => (
+          t.ukljuceno.skupine.map((g) => (
             <div class="border-t border-naglasak/30 pt-8" data-reveal>
               <div class="flex items-center gap-4">
                 <Ikona ime={g.ikona} velicina={32} class="text-naglasak" />
@@ -135,7 +120,7 @@ const ukljuceno = [
           ))
         }
         <div class="relative aspect-[16/10] overflow-hidden lg:hidden" data-reveal>
-          <Picture src={vatromet} alt="Hladni vatromet i para na plesnom podiju tijekom prvog plesa" formats={['avif', 'webp']} widths={[480, 800]} sizes="100vw" class="h-full w-full object-cover" />
+          <Picture src={vatromet.slika} alt={vatromet.alt} formats={['avif', 'webp']} widths={[480, 800]} sizes="100vw" class="h-full w-full object-cover" />
         </div>
       </div>
     </div>
@@ -150,7 +135,7 @@ const ukljuceno = [
   </section>
 
   <!-- MANIFEST: fotografija preko cijele širine s tekstom (mijenja ritam stranice) -->
-  <FotoTraka slika={dvoranaSvijece} alt="Svečano postavljena dvorana sa srebrnim svijećnjacima" poravnanje="sredina" visina="min-h-[60dvh]">
+  <FotoTraka slika={dvoranaSvijece.slika} alt={dvoranaSvijece.alt} poravnanje="sredina" visina="min-h-[60dvh]">
     <p class="font-display text-4xl leading-snug md:text-6xl">
       Svako vjenčanje je nova priča. <em class="italic text-zlato-300">Neka vaša bude jedinstvena.</em>
     </p>
